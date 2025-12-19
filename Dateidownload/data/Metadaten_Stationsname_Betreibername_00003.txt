@@ -1,0 +1,6 @@
+Stations_ID;Stationsname;Von_Datum;Bis_Datum
+     3;Aachen;18910101;20120406
+
+Stations_ID;Betreibername;Von_Datum;Bis_Datum
+     3;DWD;18910101;20120406
+generiert: 15.05.2025 --  Deutscher Wetterdienst  --
