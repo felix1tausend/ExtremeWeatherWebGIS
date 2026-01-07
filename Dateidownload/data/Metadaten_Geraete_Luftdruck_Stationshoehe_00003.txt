@@ -1,6 +1,0 @@
-Stations_ID;Stationsname;Geo. Laenge [Grad];Geo. Breite [Grad];Stationshoehe [m];Barometerhoehe ueber NN [m];Von_Datum;Bis_Datum;Geraetetyp Name;Messverfahren;eor;
-3;Aachen;;;;;19040101;19500331;Gerätetyp unbekannt;Luftdruckmessung, konv.;eor;
-3;Aachen;6.09;50.78;202;205.1;19500401;20071202;Stationsbarometer;Luftdruckmessung, konv.;eor;
-3;Aachen;6.09;50.78;202;205.1;19930701;20081007;Digitalbarometer AIR-DB;Luftdruckmessung, elektr.;eor;
-3;Aachen;6.09;50.78;202;204.96;20081008;20120406;Digitalbarometer AIR-DB;Luftdruckmessung, elektr.;eor;
-generiert: 15.05.2025 --  Deutscher Wetterdienst  --

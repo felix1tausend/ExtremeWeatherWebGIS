@@ -1,5 +1,0 @@
-Stations_ID;Stationsname;Geo. Laenge [Grad];Geo. Breite [Grad];Stationshoehe [m];Geberhoehe ueber Grund [m];Von_Datum;Bis_Datum;Geraetetyp Name;Messverfahren;eor;
-3;Aachen;;;;;19360101;19500331;Gerätetyp unbekannt;Temperaturmessung, konv.;eor;
-3;Aachen;6.09;50.78;202;.05;19500401;20070627;Minimumthermometer;Temperaturmessung, konv.;eor;
-3;Aachen;6.09;50.78;202;.05;19890719;20120406;PT 100 (Luft);Temperaturmessung, elektr.;eor;
-generiert: 15.05.2025 --  Deutscher Wetterdienst  --
