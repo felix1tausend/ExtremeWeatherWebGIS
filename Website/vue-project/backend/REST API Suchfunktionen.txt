@@ -1,0 +1,45 @@
+REST API Suchfunktionen
+
+1 Alle Stationen, 1 Messwert an einem bestimmten Tag
+
+2 Stationen aus einem bestimmten Bundesland, 1 Messwert an einem bestimmten Tag
+
+3 bestimmte Station, 1 Messwert an einem bestimmten Tag
+
+
+
+4 Alle Stationen, höchster oder niedrigster Messwert in bestimmten Zeitraum
+
+5 Stationen aus einem bestimmten Bundesland, höchster oder niedrigster Messwert in bestimmten Zeitraum
+
+6 bestimmte Station, höchster oder niedrigster Messwert in bestimmten Zeitraum
+
+
+
+7 Alle Stationen, Messwert ab bestimmter Schwelle in bestimmten Zeitraum
+
+8 Stationen aus einem bestimmten Bundesland, Messwert ab bestimmter Schwelle in bestimmten Zeitraum
+
+9 bestimmte Station, Messwert ab bestimmter Schwelle in bestimmten Zeitraum
+
+
+
+
+Analyse:
+
+1 Alle Stationen, extremstes Jahr, Monat oder Woche für einen Messwert
+
+2 Stationen aus einem bestimmten Bundesland, extremstes Jahr, Monat oder Woche für einen Messwert
+
+3 bestimmte Station, extremstes Jahr, Monat oder Woche für einen Messwert
+
+
+4 Alle Stationen, ein Messwert, durchschnittliche jährliche Änderung (Trend)
+
+5 Stationen aus einem bestimmten Bundesland, ein Messwert, durchschnittliche jährliche Änderung (Trend)
+
+6 bestimmte Station, ein Messwert, durchschnittliche jährliche Änderung (Trend)
+
+
+
+

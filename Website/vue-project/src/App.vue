@@ -3,13 +3,20 @@ import { onMounted } from 'vue'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 
+let map
+let osm
+let google
+let baseMaps
+let overlayMaps
+let layerControl
+
 
 onMounted(async() => {
 
 
   map = L.map('map',{
   center: [51.0557, 13.7274],
-  zoom: 14,
+  zoom: 7,
   zoomControl: false, 
   });
 
@@ -40,18 +47,17 @@ onMounted(async() => {
     }
 
   markerGroup.addTo(map);
-      
-  
 
 
 baseMaps = { "OSM": osm,
   "Satellit": google
 };
 
-overlayMaps ={"Station Dresden Mitte": markerGroup};
+overlayMaps ={"Tagesmaximaltemperatur aller Stationen": markerGroup};
 
 layerControl = L.control.layers(baseMaps, overlayMaps).addTo(map);
 L.control.zoom({position: 'bottomright'}).addTo(map);
+map.fitBounds(markerGroup.getBounds())
 
 
 })

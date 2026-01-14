@@ -2,6 +2,7 @@ from flask import Flask, jsonify
 import psycopg2
 from configparser import ConfigParser
 from flask_cors import CORS
+from psycopg2 import sql
 
 
 
@@ -26,16 +27,28 @@ def db_connection():
 
 
 @app.route("/api/testmesswert", methods=['GET'])
-def auslesen():
+def testmesswert():
     conn = db_connection()
     cur = conn.cursor()
-    cur.execute("""SELECT station.stat_name, station.breite, station.laenge, messwerte_teststation_dd.txk FROM wetter_fue.messwerte_teststation_dd
-                JOIN wetter_fue.station on messwerte_teststation_dd.stations_id = station.stations_id
-                WHERE messwerte_teststation_dd.mess_datum = '1900-01-01';  """)
+    parameter = 'txk'
+    query = sql.SQL("""
+    SELECT
+        stationlist.stationsname,
+        stationlist.geobreite,
+        stationlist.geolaenge,
+        stationdata.{column}
+    FROM stationdata
+    JOIN stationlist
+      ON stationdata.stations_id = stationlist.stations_id
+    WHERE stationdata.mess_datum = %s;
+    """).format(
+    column=sql.Identifier(parameter)
+    )
+    messdatum = '2022-01-01'
+    cur.execute(query, (messdatum,))
     rows = cur.fetchall()
     cur.close()
     conn.close()
-
 
     data = []
     for row in rows:
@@ -45,10 +58,45 @@ def auslesen():
             "lng": row[2],
             "txk": row[3]
         })
+    return jsonify(data)
 
+
+@app.route("/api/testmesswert", methods=['GET'])
+def auslesen():
+    conn = db_connection()
+    cur = conn.cursor()
+    parameter = 'txk'
+    query = sql.SQL("""
+    SELECT
+        stationlist.stationsname,
+        stationlist.geobreite,
+        stationlist.geolaenge,
+        stationdata.{column}
+    FROM stationdata
+    JOIN stationlist
+      ON stationdata.stations_id = stationlist.stations_id
+    WHERE stationdata.mess_datum = %s;
+    """).format(
+    column=sql.Identifier(parameter)
+    )
+    messdatum = '2022-01-01'
+    cur.execute(query, (messdatum,))
+    rows = cur.fetchall()
+    cur.close()
+    conn.close()
+
+    data = []
+    for row in rows:
+        data.append({
+            "name": row[0],
+            "lat": row[1],
+            "lng": row[2],
+            "txk": row[3]
+        })
     return jsonify(data)
 
 
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
+
