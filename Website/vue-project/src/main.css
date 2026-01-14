@@ -1,0 +1,11 @@
+#map {
+    height: 80vh;
+    width: 90vw;
+}
+
+.mapwrapper{
+    display: flex;
+    align-items: center;    /*vertikale Positionierung*/
+    justify-content: center; /*horizontale Positionierung*/
+}
+

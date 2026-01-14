@@ -70,7 +70,7 @@ for f in filelist:
         chunk['MESS_DATUM'] = pd.to_datetime(chunk['MESS_DATUM'], format='%Y%m%d')
         
         #Direkt in finale CSV schreiben
-        chunk.to_csv(final_file, sep=';', mode='a', header=first_file, index=False)
+        chunk.to_csv(final_file, sep=';',columns=['STATIONS_ID','MESS_DATUM','FX','RSK','TXK','TNK'], mode='a', header=first_file, index=False)
         first_file = False
 
 
