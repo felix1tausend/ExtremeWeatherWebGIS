@@ -61,6 +61,7 @@ cols_fill = ['STATIONS_ID','FX','RSK','TXK', 'TNK']
 first_file = True
 
 for f in filelist:
+    #stückweises Laden der Daten in den Arbeitsspeicher
     for chunk in pd.read_csv(f, chunksize=100_000, engine = 'python'):
         #Leere Werte auffüllen
         chunk[cols_fill] = chunk[cols_fill].fillna(0)

@@ -57,7 +57,7 @@ overlayMaps ={"Tagesmaximaltemperatur aller Stationen": markerGroup};
 
 layerControl = L.control.layers(baseMaps, overlayMaps).addTo(map);
 L.control.zoom({position: 'bottomright'}).addTo(map);
-map.fitBounds(markerGroup.getBounds())
+
 
 
 })

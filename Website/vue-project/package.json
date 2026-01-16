@@ -12,6 +12,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "flask": "^0.2.10",
     "leaflet": "^1.9.4",
     "vue": "^3.5.26"
   },
