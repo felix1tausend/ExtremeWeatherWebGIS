@@ -67,13 +67,20 @@ def testmesswert():
 def fundamentalsearch():
     #Darstellung eines Parameters und festgelegten Tages für die einfache Suchabfrage
     #Ergebnis ist Kartenausschnitt mit Stationen und ihren Werten an einem bestimmten festgelegten Tag
+
+    #Basisparameter
     parameter = request.args.get("parameter")
     messdatum = request.args.get("messdatum")
+
+    #räumliche Auswahl
     bundesland = request.args.get("bundesland") #optional
     stationsname = request.args.get("stationsname") #optional
+    stationshöhe = request.args.get("stationshöhe") #optional
+
+    #Werteingrenzung
     untereschwelle = request.args.get("untereschwelle")#optional #Messwert soll größergleich einem angegebenen Schwellwert sein
     obereschwelle = request.args.get("obereschwelle")#optional #Messwert soll kleinergleich einem angegebenen Schwellwert sein
-    stationshöhe = request.args.get("stationshöhe") #optional
+    #Liste mit top 10 höchsten und niedrigsten Werten
 
 
 
@@ -86,36 +93,33 @@ def expandedsearch():
     #1) Kartenausschnitt mit einzelnen Stationen und ihren extremsten Werten/ Durchschnittlichen Messwerten in dem Zeitraum mit Angabe des Datums
     #2) Liste am Rand der Karte mit den extremsten Werten
 
+    #Basisparameter
     parameter = request.args.get("parameter")
     von_datum = request.args.get("von_datum")
     bis_datum = request.args.get("bis_datum")
-
-    #Aggregatfunktionen
-    maximum = request.args.get("maximum") #maximale Werte in einem Zeitraum, mit angabe des Messdatums
-    minimum = request.args.get("minimum") #minimale Werte in einem Zeitraum, mit angabe des Messdatums
-    durchschnitt = request.args.get("durchschnitt") #durchschnittliche Werte in einem Zeitraum
-
-    summe = request.args.get("summe") #NUR bei Niederschlag sinnvoll
 
     #räumliche Auswahl
     bundesland = request.args.get("bundesland") #optional
     stationsname = request.args.get("stationsname") #optional
     stationshöhe = request.args.get("stationshöhe") #optional
 
-    #bei Bedarf PDF-Erzeugung
+    #Aggregatfunktionen
+    aggregation = request.args.get("aggregation") # erlaubt: max | min | avg | sum
+     #maximale Werte in einem Zeitraum, mit angabe des Messdatums, pro Station, evtl mit liste pro Station
+     #minimale Werte in einem Zeitraum, mit angabe des Messdatums, pro Station, evtl mit liste pro Station
+     #durchschnittliche Werte in einem Zeitraum, pro Station, evtl mit liste am Rand mit top 10 höchsten und niedrigsten durschschnittliche Werte
+     #Summe NUR bei Niederschlag sinnvoll
+
+
 
 
 @app.route("/api/statisticalanalysis", methods=['GET'])
 def statisticalanalysis():
-    #Darstellung von komplexeren Trends und Mustern der Wetterdaten mithilfe von Diagrammen 
-    parameter = request.args.get("parameter")
+    #Darstellung von komplexeren Trends und Mustern der Wetterdaten mithilfe von Diagrammen
+  
+    analysetyp = request.args.get("analysetyp") #z.b. Hitzetage, Kältetage, zukünftiger trend; in Abhängigkeit davon weitere Auswahlmöglichkeiten
     von_datum = request.args.get("von_datum")
     bis_datum = request.args.get("bis_datum")
-
-    #räumliche Auswahl
-    bundesland = request.args.get("bundesland") #optional
-    stationsname = request.args.get("stationsname") #optional
-    stationshöhe = request.args.get("stationshöhe") #optional
 
 
 

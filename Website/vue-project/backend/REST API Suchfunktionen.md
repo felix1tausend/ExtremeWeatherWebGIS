@@ -90,57 +90,15 @@ REST API Suchfunktionen
 
 
 
-1 Alle Stationen, extremstes Jahr, Monat oder Woche für einen Messwert
+Hitzetage, Tropennächte, Frosttage, Dürretage, Sturmtage 
 
 
 
-2 Stationen aus einem bestimmten Bundesland, extremstes Jahr, Monat oder Woche für einen Messwert
+Trends der Parameter
 
 
 
-3 bestimmte Station, extremstes Jahr, Monat oder Woche für einen Messwert
-
-
-
-
-
-4 Alle Stationen, ein Messwert, durchschnittliche jährliche Änderung (Trend)
-
-
-
-5 Stationen aus einem bestimmten Bundesland, ein Messwert, durchschnittliche jährliche Änderung (Trend)
-
-
-
-6 bestimmte Station, ein Messwert, durchschnittliche jährliche Änderung (Trend)
-
-
-
-7 bestimmte höhe, unterhalb/ oberhalb
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-wann Zeitraum?
-
-
-
-
-
-
-
-
+extremste Jahre, Monate
 
 
 
