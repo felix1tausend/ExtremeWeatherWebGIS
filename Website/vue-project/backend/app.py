@@ -6,12 +6,13 @@ from psycopg2 import sql
 
 
 
+
 app = Flask(__name__)
 CORS(app) 
 
 def db_connection():
     parser = ConfigParser()
-    parser.read('database.ini')
+    parser.read('database.ini', encoding="utf-8")
     db = parser['postgresql']  
     
     
@@ -46,7 +47,7 @@ def testmesswert():
     column=sql.Identifier(parameter)
     )
     messdatum = '2022-01-01'
-    bundesland = 'Brandenburg'
+    bundesland = 'Sachsen'
     cur.execute(query, (messdatum,bundesland))
     rows = cur.fetchall()
     cur.close()

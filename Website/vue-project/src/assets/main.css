@@ -1,0 +1,27 @@
+#map {
+    height: 100vh;
+    width: 100%;
+}
+
+.mapwrapper{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+
+.leaflet-top.leaflet-right {
+  top: 5vh;
+}
+.leaflet-control-layers {
+  font-family: 'Ubuntu', sans-serif;
+  background-color: rgba(20, 45, 76, 0.95);
+  color: #fff;
+}

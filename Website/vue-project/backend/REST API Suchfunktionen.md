@@ -102,3 +102,17 @@ extremste Jahre, Monate
 
 
 
+
+
+
+
+
+
+ZUSATZFUNKTION:
+
+
+
+Interpolation von Stationsmesswerten zu einer Rasterkarte
+
+
+

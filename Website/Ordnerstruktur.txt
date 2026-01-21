@@ -1,0 +1,23 @@
+Ordnerstruktur
+
+|-- backend
+|	|-app.py
+|	|-database.ini
+|
+|-- src
+|	|--api	
+|		|--api.js
+|	|--assets
+|		|--main.css
+|	|--components
+|		|--ControlPanel.vue
+|		|--ExpandedSearch.vue
+|		|--FundamentalSearch.vue
+|		|--StatisticalAnalysis.vue
+|		|--Map.vue
+|	|--views
+|		|--MapView.vue
+|	|--App.vue	
+|	|--main.js	
+|
+|-- index.html
