@@ -40,21 +40,20 @@ const showInfo = ref(false)
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&display=swap');
 #navbar1 {
+  height: 40px;
   width: 100%;
-  height: 4vh;
-  font-family: 'Ubuntu', system-ui, sans-serif;
-  font-size: 2.9vh;
-  color: #d9dbdd;
-  background-color: #142d4c;
-  box-shadow: 0 1px 10px rgb(51, 51, 51);
-  z-index: 1000;
+  z-index: 2000;
   position: fixed;
+  background-color: #142d4c;
+  box-shadow: 0 1px 10px rgb(0, 0, 0);
+  font-family: 'Ubuntu', system-ui, sans-serif;
+  color: #d9dbdd;
 }
 
 ul {
+  height: 100%;
   display: flex;
   align-items: center;
-  height: 100%;
   list-style: none;
   margin: 0;
   padding: 0 0.5vw;
@@ -65,65 +64,61 @@ ul {
 }
 
 .info-btn {
-  display: flex;
-  align-items: center; 
-  justify-content: center;
-  width: 2vh;
-  height: 2vh;
+  height: 20px;
+  width: 20px;
   border-radius: 10%;
-  font-family: 'Times New Roman', Times, serif;
+  font-weight: 600;
   border: 2px solid #4b6380;
   background: transparent;
+  font-family: 'Times New Roman', Times, serif;
   color: #d9dbdd;
-  font-weight: 600;
-  font-size: 1.2vh;
-  line-height: 1;
   cursor: pointer;
 }
 
 .info-btn:hover {
-  background-color: rgba(56, 81, 112, 0.15);
+  background-color: rgb(56, 81, 112);
 }
 
 
 
 .modal {
-  position: fixed;
-  width: 100%;
   height: 100%;
-  background-color: rgba(0,0,0,0.5);
+  width: 100%;
+  z-index: 10000;
+  position: fixed;
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 10000;
+  background-color: rgba(0,0,0,0.5);
 }
 
 
 .modal-content {
-  background-color: #142d4cdc;
-  color: #fff;
+  height: 500px;
+  width: 45vw;
   border-radius: 8px;
   padding-left: 1em;
   padding-right: 1em;
   border: 3px solid #4b6380;
-  width: 55vw;
-  height: 55vh;
+  background-color: #142d4cdc;
   font-family: 'Ubuntu', sans-serif;
   text-align: justify;
+  color: #fff;
+  overflow: auto;
 }
 
 
 .close-btn {
   margin-top: 1em;
+  margin-bottom: 1em;
   padding: 0.5em 1em;
   border: 2px solid #4b6380;
   border-radius: 1px;
   float: right;
   background-color: #385170;
+  font-family: 'Ubuntu', system-ui, sans-serif;
   color: #fff;
   cursor: pointer;
-  font-family: 'Ubuntu', system-ui, sans-serif;
-  font-size: large;
 }
 
 .close-btn:hover {
@@ -131,6 +126,6 @@ ul {
 }
 
 p {
-  font-size: x-large;
+  font-size: 100%;
 }
 </style>
