@@ -2,6 +2,7 @@
   <div class="map-view">
     <NavBar></NavBar>
     <LayerControl></LayerControl>
+    <BasicSearchInterface></BasicSearchInterface>
     <FundamentalSearch @updateStations="stations = $event"/>
     <Map :stations="stations"/>
   </div>
@@ -12,6 +13,7 @@ import { ref } from 'vue'
 import NavBar from '../components/NavBar.vue'
 import LayerControl from '@/components/LayerControl.vue'
 import Map from '../components/Map.vue'
+import BasicSearchInterface from '@/components/BasicSearchInterface.vue'
 import FundamentalSearch from '../components/FundamentalSearch.vue'
 
 const stations = ref([])
