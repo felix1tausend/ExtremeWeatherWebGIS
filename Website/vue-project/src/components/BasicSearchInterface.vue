@@ -3,7 +3,7 @@
         :class="{ closed: !sidebarOpen }">
         <div id="navbar2"> 
             <ul id ="ul2">
-                <li class="li2"><button class="navbar2button">Einfache Suche</button></li>
+                <li class="li2"><button class="navbar2button" @click="active = 'fundamental'">Einfache Suche</button></li>
                 <li class="li2" id = "list2"><button class="navbar2button">Erweiterte Suche</button></li>
                 <li class="li2" id = "list3"><button class="navbar2button">Statistische Analyse</button></li>
             </ul>
@@ -15,12 +15,15 @@
 >
              {{ sidebarOpen ? '❮❮' : '❯❯' }}
         </button>
+        <FundamentalSearch v-if="active === 'fundamental'" />
     </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
+import FundamentalSearch from '@/components/FundamentalSearch.vue'
 const sidebarOpen = ref(true) 
+const active = ref(null)
 </script>
 
 <style> 
@@ -32,6 +35,7 @@ const sidebarOpen = ref(true)
   border-right: 2px solid #142d4c;
   background-color: rgba(255, 255, 255, 0.836);
   transition: transform 0.5s ease;
+  
 }
 
 #div1.closed {

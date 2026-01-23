@@ -42,13 +42,15 @@ def testmesswert():
     JOIN stationen
       ON messwerte.stations_id = stationen.stations_id
     WHERE messwerte.mess_datum = %s
-    AND stationen.bundesland like %s;
+    AND (stationen.bundesland like %s 
+    OR stationen.bundesland like %s);
     """).format(
     column=sql.Identifier(parameter)
     )
     messdatum = '2022-01-01'
-    bundesland = 'Sachsen'
-    cur.execute(query, (messdatum,bundesland))
+    bundesland = 'Brandenburg'
+    bundesland2 = 'Sachsen'
+    cur.execute(query, (messdatum,bundesland,bundesland2))
     rows = cur.fetchall()
     cur.close()
     conn.close()
