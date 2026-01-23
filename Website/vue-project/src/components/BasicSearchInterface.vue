@@ -34,8 +34,6 @@ const active = ref(null)
   z-index: 1000;
   border-right: 2px solid #142d4c;
   background-color: rgba(255, 255, 255, 0.836);
-  transition: transform 0.5s ease;
-  
 }
 
 #div1.closed {
