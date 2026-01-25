@@ -4,15 +4,15 @@
     <div id="Basisparameter" class="bereich">
         <h3>Basisfilter</h3>
         <p>Wetterparameter:
-            <select id="wetterparametereingabe" class ="eingabe">
-            <option>Tagesmaximaltemperatur</option>
-            <option>Tagesminimaltemperatur</option>
-            <option>Tagesmaximalgeschwindigkeit</option>
-            <option>Tagesniederschlag</option>
-        </select>
+            <select v-model="parameter" class="eingabe">
+            <option value="txk">Tagesmaximaltemperatur</option>
+            <option value="tnk">Tagesminimaltemperatur</option>
+            <option value="fx">Tagesmaximalwindgeschwindigkeit</option>
+            <option value="rsk">Tagesniederschlag</option>
+            </select>
         </p>
         <p>Datum:
-            <input id="datumseingabe" class ="eingabe" type="date" value="2024-12-31" min="1950-01-01" max="2024-12-31"> </input>
+            <input id="datumseingabe" class ="eingabe" type="date" value="2024-12-31" min="1950-01-01" max="2024-12-31" v-model="messdatum">
 
         </p>
         
@@ -21,7 +21,7 @@
     <div id="Raumauswahl" class="bereich">
         <h3>Räumliche Auswahl (optional) </h3>
         <p>Bundesland:
-            <select id="Bundeslandeingabe" class ="eingabe">
+            <select id="Bundeslandeingabe" class ="eingabe" >
                 <option></option>
                 <option>Baden-Württemberg</option>
                 <option>Bayern</option>
@@ -42,21 +42,67 @@
             </select>
         </p>
         <p>Stationen:
-            <input class ="eingabe" type="search" placeholder="Nach Station suchen..."> </input>
+            <input class ="eingabe" type="search" placeholder="Nach Station suchen...">
         </p>
-        <p>Stationshöhe:
-            <p class="höhentext"> über &nbsp; <input class ="eingabe"> </input></p> 
-            <p class="höhentext">unter &nbsp; <input class ="eingabe"></p>
-        </p>
+        <div><p>Stationshöhe:</p>
+            <div id="höhenblock">
+                <p class="höhentext"> über &nbsp; <input class ="eingabe2"> m</p>
+                <p class="höhentext">unter <input class ="eingabe2"> m</p>
+            </div>
+        </div>
     </div>
     <div id = "Werteingrenzung" class="bereich">
         <h3>Werteingrenzung (optional)</h3>
-        <p>Messwertebereich:</p>
+        <div><p>Messwertebereich:</p>
+            <div id="höhenblock">
+                <p class="höhentext"> über &nbsp; <input class ="eingabe2"> {{ einheit }}</p>
+                <p class="höhentext">unter <input class ="eingabe2"> {{ einheit }}</p>
+            </div>
+        </div>
     </div>
-    <div id ="Listenbereich" class="bereich"></div>
+    <div id ="Listenbereich" class="bereich">
+        
+    </div>
 
   </div>
 </template>
+
+<script setup>
+import { ref, computed } from 'vue'
+const parameter = ref('txk')
+const messdatum = ref('2024-12-31')
+const einheit = computed(() => {
+  switch (parameter.value) {
+    case 'txk':
+        return '°C'
+    case 'tnk':
+      return '°C'
+    case 'fx':
+      return 'm/s'
+    case 'rsk':
+      return 'mm'
+    default:
+      return ''
+  }
+})
+
+const baseUrl = "http://localhost:5173/"
+const requestUrl = computed(() => {
+  return `${baseUrl}?parameter=${parameter.value}&messdatum=${messdatum.value}`
+})
+
+
+
+
+
+
+
+
+
+
+
+
+</script>
 
 <style scoped>
 .fundamental-search {
@@ -83,13 +129,37 @@ h2{
     color: white;
 }
 
+.eingabe2{
+    float: center;
+    padding: 2px;
+    background-color: #142d4cd1;
+    border: 2px solid #142d4c;
+    border-radius: 2px;
+    color: white;
+}
+
+#höhenblock{
+    display: grid;
+    justify-content: right;
+    margin-right: 5%;
+
+}
+
 .höhentext{
-    text-align: right;
+    margin-bottom: 10px;
+    margin-top: 0px;
+    width: max-content;
+    text-align: left;
     
 }
 
 .bereich{
     overflow: hidden;
+}
+
+::placeholder {
+  color: rgb(192, 190, 190);
+  opacity: 1;
 }
 
 </style>

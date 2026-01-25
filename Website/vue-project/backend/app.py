@@ -78,11 +78,12 @@ def fundamentalsearch():
     #räumliche Auswahl
     bundesland = request.args.get("bundesland") #optional
     stationsname = request.args.get("stationsname") #optional
-    stationshöhe = request.args.get("stationshöhe") #optional
+    höheüber = request.args.get("höheüber") #optional
+    höheunter = request.args.get("höheunter") #optional
 
     #Werteingrenzung
     untereschwelle = request.args.get("untereschwelle")#optional #Messwert soll größergleich einem angegebenen Schwellwert sein
-    obereschwelle = request.args.get("obereschwelle")#optional #Messwert soll kleinergleich einem angegebenen Schwellwert sein
+    obereschwelle = request.args.get("höheunter")#optional #Messwert soll kleinergleich einem angegebenen Schwellwert sein
     #Liste mit top 10 höchsten und niedrigsten Werten
 
 
@@ -104,7 +105,8 @@ def expandedsearch():
     #räumliche Auswahl
     bundesland = request.args.get("bundesland") #optional
     stationsname = request.args.get("stationsname") #optional
-    stationshöhe = request.args.get("stationshöhe") #optional
+    höheüber = request.args.get("höheüber") #optional
+    höheunter = request.args.get("höheunter") #optional
 
     #Aggregatfunktionen
     aggregation = request.args.get("aggregation") # erlaubt: max | min | avg | sum
