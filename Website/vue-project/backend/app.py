@@ -70,21 +70,52 @@ def testmesswert():
 def fundamentalsearch():
     #Darstellung eines Parameters und festgelegten Tages für die einfache Suchabfrage
     #Ergebnis ist Kartenausschnitt mit Stationen und ihren Werten an einem bestimmten festgelegten Tag
-
     #Basisparameter
     parameter = request.args.get("parameter")
     messdatum = request.args.get("messdatum")
-
     #räumliche Auswahl
     bundesland = request.args.get("bundesland") #optional
     stationsname = request.args.get("stationsname") #optional
     höheüber = request.args.get("höheüber") #optional
     höheunter = request.args.get("höheunter") #optional
-
     #Werteingrenzung
     untereschwelle = request.args.get("untereschwelle")#optional #Messwert soll größergleich einem angegebenen Schwellwert sein
     obereschwelle = request.args.get("höheunter")#optional #Messwert soll kleinergleich einem angegebenen Schwellwert sein
     #Liste mit top 10 höchsten und niedrigsten Werten
+
+    conn = db_connection()
+    cur = conn.cursor()
+    query = sql.SQL("""SELECT  
+                        stationen.von_datum, 
+                        stationen.bis_datum,
+                        stationen.stationshoehe,
+                        stationen.stationsname,
+                        stationen.bundesland,
+                        stationen.geom,
+                        messwerte.mess_datum,
+                        messwerte.{column}
+                    FROM messwerte
+                    JOIN stationen
+                    ON messwerte.stations_id = stationen.stations_id
+                    WHERE stationen.{column} like %s
+                    AND messwerte.mess_datum like %s;
+                    """).format(column=sql.Identifier(parameter))
+    
+    cur.execute(query, (parameter,messdatum))
+    rows = cur.fetchall()
+    cur.close()
+    conn.close()
+
+    data = []
+    for row in rows:
+        data.append({
+            "stationshoehe": row[2],
+            "stationsname": row[3],
+            "geom": row[5],
+            "mess_datum": row[6],
+            "parameter": row[7]
+        })
+    return jsonify(data)
 
 
 

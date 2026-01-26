@@ -21,8 +21,7 @@
     <div id="Raumauswahl" class="bereich">
         <h3>Räumliche Auswahl (optional) </h3>
         <p>Bundesland:
-            <select id="Bundeslandeingabe" class ="eingabe" >
-                <option></option>
+            <select id="Bundeslandeingabe" class ="eingabe" v-model="bundesland" value="" >
                 <option>Baden-Württemberg</option>
                 <option>Bayern</option>
                 <option>Berlin</option>
@@ -61,6 +60,9 @@
         </div>
     </div>
     <div id ="Listenbereich" class="bereich">
+        <button @click="sucheStarten">
+  Suchen
+</button>
         
     </div>
 
@@ -71,6 +73,7 @@
 import { ref, computed } from 'vue'
 const parameter = ref('txk')
 const messdatum = ref('2024-12-31')
+const bundesland = ref('')
 const einheit = computed(() => {
   switch (parameter.value) {
     case 'txk':
@@ -86,7 +89,7 @@ const einheit = computed(() => {
   }
 })
 
-const baseUrl = "http://localhost:5173/"
+const baseUrl = "http://localhost:5000/api/fundamentalsearch/"
 const requestUrl = computed(() => {
   return `${baseUrl}?parameter=${parameter.value}&messdatum=${messdatum.value}`
 })
