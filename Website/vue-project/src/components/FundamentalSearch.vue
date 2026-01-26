@@ -4,7 +4,7 @@
     <div id="Basisparameter" class="bereich">
         <h3>Basisfilter</h3>
         <p>Wetterparameter:
-            <select v-model="parameter" class="eingabe">
+            <select v-model="store.parameter" class="eingabe">
             <option value="txk">Tagesmaximaltemperatur</option>
             <option value="tnk">Tagesminimaltemperatur</option>
             <option value="fx">Tagesmaximalwindgeschwindigkeit</option>
@@ -54,15 +54,14 @@
         <h3>Werteingrenzung (optional)</h3>
         <div><p>Messwertebereich:</p>
             <div id="höhenblock">
-                <p class="höhentext"> über &nbsp; <input class ="eingabe2"> {{ einheit }}</p>
-                <p class="höhentext">unter <input class ="eingabe2"> {{ einheit }}</p>
+                <p class="höhentext"> über &nbsp; <input class ="eingabe2"> {{ store.einheit }}</p>
+                <p class="höhentext">unter <input class ="eingabe2"> {{ store.einheit }}</p>
             </div>
         </div>
     </div>
     <div id ="Listenbereich" class="bereich">
-        <button @click="sucheStarten">
-  Suchen
-</button>
+    <button @click="store.fetchResults">Suchen
+    </button>
         
     </div>
 
@@ -70,41 +69,8 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-const parameter = ref('txk')
-const messdatum = ref('2024-12-31')
-const bundesland = ref('')
-const einheit = computed(() => {
-  switch (parameter.value) {
-    case 'txk':
-        return '°C'
-    case 'tnk':
-      return '°C'
-    case 'fx':
-      return 'm/s'
-    case 'rsk':
-      return 'mm'
-    default:
-      return ''
-  }
-})
-
-const baseUrl = "http://localhost:5000/api/fundamentalsearch/"
-const requestUrl = computed(() => {
-  return `${baseUrl}?parameter=${parameter.value}&messdatum=${messdatum.value}`
-})
-
-
-
-
-
-
-
-
-
-
-
-
+import { useStore1 } from '@/stores/store1'
+const store = useStore1()
 </script>
 
 <style scoped>

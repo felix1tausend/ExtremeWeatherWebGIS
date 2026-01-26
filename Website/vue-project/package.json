@@ -15,6 +15,7 @@
     "flask": "^0.2.10",
     "leaflet": "^1.9.4",
     "leaflet-groupedlayercontrol": "^0.6.1",
+    "pinia": "^3.0.4",
     "vue": "^3.5.26"
   },
   "devDependencies": {
