@@ -12,8 +12,7 @@
             </select>
         </p>
         <p>Datum:
-            <input id="datumseingabe" class ="eingabe" type="date" value="2024-12-31" min="1950-01-01" max="2024-12-31" v-model="messdatum">
-
+            <input id="datumseingabe" class ="eingabe" type="date"  min="1950-01-01" max="2024-12-31" v-model="store.messdatum">
         </p>
         
 
@@ -21,7 +20,7 @@
     <div id="Raumauswahl" class="bereich">
         <h3>Räumliche Auswahl (optional) </h3>
         <p>Bundesland:
-            <select id="Bundeslandeingabe" class ="eingabe" v-model="bundesland" value="" >
+            <select id="Bundeslandeingabe" class ="eingabe" v-model="store.bundesland" >
                 <option>Baden-Württemberg</option>
                 <option>Bayern</option>
                 <option>Berlin</option>

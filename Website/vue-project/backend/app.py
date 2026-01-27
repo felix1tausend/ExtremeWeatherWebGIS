@@ -3,12 +3,13 @@ import psycopg2
 from configparser import ConfigParser
 from flask_cors import CORS
 from psycopg2 import sql
+import json
 
 
 
 
 app = Flask(__name__)
-CORS(app) 
+CORS(app)
 
 def db_connection():
     parser = ConfigParser()
@@ -66,7 +67,7 @@ def testmesswert():
     return jsonify(data)
 
 
-@app.route("/api/fundamentalsearch", methods=['GET'])
+@app.route("/api/fundamentalsearch/", methods=['GET'])
 def fundamentalsearch():
     #Darstellung eines Parameters und festgelegten Tages für die einfache Suchabfrage
     #Ergebnis ist Kartenausschnitt mit Stationen und ihren Werten an einem bestimmten festgelegten Tag
@@ -85,33 +86,47 @@ def fundamentalsearch():
 
     conn = db_connection()
     cur = conn.cursor()
-    query = sql.SQL("""SELECT  
-                        stationen.von_datum, 
-                        stationen.bis_datum,
-                        stationen.stationshoehe,
-                        stationen.stationsname,
-                        stationen.bundesland,
-                        stationen.geom,
-                        messwerte.mess_datum,
-                        messwerte.{column}
-                    FROM messwerte
-                    JOIN stationen
-                    ON messwerte.stations_id = stationen.stations_id
-                    WHERE stationen.{column} like %s
-                    AND messwerte.mess_datum like %s;
-                    """).format(column=sql.Identifier(parameter))
+    conditions = [
+    sql.SQL("messwerte.mess_datum = %s")
+]
+    values = [messdatum]
+
+    if bundesland:
+        conditions.append(sql.SQL("stationen.bundesland = %s"))
+        values.append(bundesland)
+
+    query = sql.SQL("""
+        SELECT
+            stationen.von_datum,
+            stationen.bis_datum,
+            stationen.stationshoehe,
+            stationen.stationsname,
+            stationen.bundesland,
+            ST_AsGeoJSON(stationen.geom) AS geom,
+            messwerte.mess_datum,
+            messwerte.{column}
+        FROM messwerte
+        JOIN stationen
+        ON messwerte.stations_id = stationen.stations_id
+        WHERE {conditions}
+    """).format(
+        column=sql.Identifier(parameter),
+        conditions=sql.SQL(" AND ").join(conditions)
+    )
     
-    cur.execute(query, (parameter,messdatum))
+    cur.execute(query, values)
     rows = cur.fetchall()
     cur.close()
     conn.close()
 
     data = []
+
     for row in rows:
         data.append({
             "stationshoehe": row[2],
             "stationsname": row[3],
-            "geom": row[5],
+            "bundesland": row[4],
+            "geom": json.loads(row[5]),
             "mess_datum": row[6],
             "parameter": row[7]
         })

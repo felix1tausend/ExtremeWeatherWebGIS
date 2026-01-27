@@ -1,23 +1,29 @@
 <script setup>
-import { onMounted } from 'vue'
+import { onMounted, watch } from 'vue'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import 'leaflet-groupedlayercontrol/dist/leaflet.groupedlayercontrol.min.css'
 import 'leaflet-groupedlayercontrol'
+import { useStore1 } from '@/stores/store1'
+const store = useStore1()
 let map
-let osm
-let google
-let otp
-let esris
-let esrit
-let baseMaps
+let markerLayer
+let osm, google, otp, esris, esrit
 let groupedLayerControl
+
+const props = defineProps({
+  stations: {
+    type: Array,
+    required: true
+  }
+})
 
 
 onMounted(async() => {
 
+
   map = L.map('map',{
-  center: [51.0557, 13.7274],
+  center: [51, 10],
   zoom: 7,
   zoomControl: false, 
   });
@@ -45,31 +51,40 @@ onMounted(async() => {
   attribution: 'Tiles &copy; Esri &mdash; Topographic'
 }).addTo(map);
 
+markerLayer = L.layerGroup().addTo(map)
 
 
-
-  
-      // Daten vom Backend abrufen
-      const response = await fetch('http://127.0.0.1:5000/api/testmesswert');
-      const data = await response.json();
-      console.log(data)
-      const markerGroup = L.layerGroup();
-    for (const item of data) {
-      L.marker([item.lat, item.lng])
-        .bindPopup(`<b>${item.name}</b><br>Tagesmaximaltemperatur: ${item.txk}`)
-        .addTo(markerGroup);
-    }
-  markerGroup.addTo(map);
-
-
-baseMaps = { "OpenStreetMap": osm, "OpenTopoMap": otp, "Satellit": google, 'ESRI Street Map': esris, 'ESRI Topographic': esrit};
-const overlayMaps = { "Stationsmesswerte": { "Tagesmaximaltemperatur": markerGroup } }
+const baseMaps = { "OpenStreetMap": osm, "OpenTopoMap": otp, "Satellit": google, 'ESRI Street Map': esris, 'ESRI Topographic': esrit};
+const overlayMaps = { "Stationsmesswerte": { "Tagesmaximaltemperatur": markerLayer } }
 
 groupedLayerControl = L.control.groupedLayers(baseMaps, overlayMaps,{ 
   position: 'topright'}).addTo(map);
 
 L.control.zoom({position: 'bottomright'}).addTo(map);
 })
+
+
+watch(
+  () => props.stations,
+  (newStations) => {
+    markerLayer.clearLayers()
+
+    newStations.forEach(station => {
+      const coords = station.geom
+
+      L.marker([
+        coords.coordinates[1],
+        coords.coordinates[0]
+      ])
+        .bindPopup(`
+          <b>${station.stationsname}</b><br>
+          ${store.parameterbezeichnung}: ${station.parameter} ${store.einheit}
+        `)
+        .addTo(markerLayer)
+    })
+  },
+  { deep: true }
+)
 </script>
 
 

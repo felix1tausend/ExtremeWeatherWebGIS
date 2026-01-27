@@ -3,16 +3,18 @@
     <NavBar></NavBar>
     <LayerControl></LayerControl>
     <BasicSearchInterface></BasicSearchInterface>
-    <Map></Map>
+    <Map v-if="store.results" :stations="store.results" />
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { useStore1 } from '@/stores/store1'
+const store = useStore1()
 import NavBar from '../components/NavBar.vue'
 import LayerControl from '@/components/LayerControl.vue'
 import Map from '../components/Map.vue'
 import BasicSearchInterface from '@/components/BasicSearchInterface.vue'
+
 
 </script>
 
