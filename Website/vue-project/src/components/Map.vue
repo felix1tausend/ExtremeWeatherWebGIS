@@ -63,6 +63,48 @@ groupedLayerControl = L.control.groupedLayers(baseMaps, overlayMaps,{
 L.control.zoom({position: 'bottomright'}).addTo(map);
 })
 
+function getColorByValue(wert, einheit) {
+  if (einheit === '°C') {
+    if (wert === -999) return 'gray' //keine Daten
+    if (wert < -30) return '#360259'
+    if (wert < -20) return '#00305A'
+    if (wert < -10) return '#0288D1'
+    if (wert < 0)   return '#0EEAFF'
+    if (wert < 10)  return '#45BF55'
+    if (wert < 20)  return '#FFE11A'
+    if (wert < 30)  return '#F2B705'
+    if (wert < 40)  return '#D23600'
+    return '#440505'
+  }
+if (einheit === 'm/s') {
+  if (wert === -999) return 'gray' //keine Daten
+  if (wert < 0.3)  return '#FFFFFF'  // Bft 0 
+  if (wert < 3.4)  return '#81D4FA'  // Bft 2
+  if (wert < 5.5)  return '#4FC3F7'  // Bft 3
+  if (wert < 8.0)  return '#4CAF50'  // Bft 4
+  if (wert < 10.8) return '#CDDC39'  // Bft 5
+  if (wert < 13.9) return '#FFEB3B'  // Bft 6
+  if (wert < 17.2) return '#FFC107'  // Bft 7
+  if (wert < 20.8) return '#FF9800'  // Bft 8
+  if (wert < 24.5) return '#F44336'  // Bft 9
+  if (wert < 28.5) return '#D32F2F'  // Bft 10
+  if (wert < 32.7) return '#7B1FA2'  // Bft 11
+  return '#4A148C'                   // Bft 12
+}
+if (einheit === 'mm') {
+  if (wert === -999) return 'gray' // keine Daten
+  if (wert < 0.1)  return '#FFFFFF'
+  if (wert < 1)    return '#E3F2FD'
+  if (wert < 5)    return '#90CAF9'
+  if (wert < 10)   return '#42A5F5'
+  if (wert < 20)   return '#1E88E5'
+  if (wert < 30)   return '#1565C0'
+  if (wert < 50)   return '#6A1B9A'
+  if (wert < 100)  return '#AD1457'
+  return '#B71C1C'                 
+}}
+
+
 
 watch(
   () => props.stations,
@@ -78,10 +120,10 @@ watch(
       ], {radius: 7})
         .bindPopup(`
           <b>${station.stationsname}</b><br>
-          ${store.parameterbezeichnung}: ${station.parameter} ${store.einheit}
+          ${store.parameterbezeichnung}: ${station.wert} ${store.einheit}
         `)
         .addTo(markerLayer)
-        circleMarker.setStyle({fillColor: 'darkblue', opacity: 0, fillOpacity: 0.5});
+        circleMarker.setStyle({fillColor: getColorByValue(station.wert,store.einheit), opacity: 1, weight: '0.5', color: 'black', fillOpacity: 0.8});
     })
   },
   { deep: true }

@@ -128,7 +128,7 @@ def fundamentalsearch():
             "bundesland": row[4],
             "geom": json.loads(row[5]),
             "mess_datum": row[6],
-            "parameter": row[7]
+            "wert": row[7]
         })
     return jsonify(data)
 
