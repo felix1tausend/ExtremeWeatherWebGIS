@@ -16,7 +16,7 @@
             <p> Dieses GIS visualisiert vergangene Extremwetterereignisse ab 1950 in Deutschland. <br>
                 Dabei haben Sie die Möglichkeit, durch weitgehende Analysefunktionen an über 1300 Wetterstationen des Deutschen Wetterdienstes mehr über die Ausmaße von Extremwetter im gesamten Bundesgebiet zu erfahren. <br>
                 <br>
-                Im Zuge Dessen können Sie nach den 4 ausschlaggebenden Parametern <strong>Tagesmaximaltemperatur</strong>, <strong>Tagesminaimaltemperatur</strong>, <strong>Tageshöchstwindgeschwindigkeit</strong> und analysieren. <br>
+                Im Zuge dessen können Sie nach den 4 ausschlaggebenden Parametern <strong>Tagesmaximaltemperatur</strong>, <strong>Tagesminaimaltemperatur</strong>, <strong>Tageshöchstwindgeschwindigkeit</strong> und <strong>Tagesniederschlagssumme</strong> analysieren. <br>
                 Die 3 im WebGIS vorkommenden Analysebereiche <i>Einfache Suche</i>, <i>Erweiterte Suche</i> und <i>Statistische Analyse</i> bieten hierbei eine logische Strukturierung, um den Einsatz des GIS effizient zu organisieren. <br>
                 <br>
                 Die <i>Einfache Suche</i> eignet sich für die Filterung nach bestimmten Wertebereichen der Messwerte an einem festgelegten Tag. <br>

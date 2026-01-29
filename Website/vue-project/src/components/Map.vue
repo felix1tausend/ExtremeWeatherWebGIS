@@ -72,15 +72,16 @@ watch(
     newStations.forEach(station => {
       const coords = station.geom
 
-      L.marker([
+     const circleMarker = L.circleMarker([
         coords.coordinates[1],
         coords.coordinates[0]
-      ])
+      ], {radius: 7})
         .bindPopup(`
           <b>${station.stationsname}</b><br>
           ${store.parameterbezeichnung}: ${station.parameter} ${store.einheit}
         `)
         .addTo(markerLayer)
+        circleMarker.setStyle({fillColor: 'darkblue', opacity: 0, fillOpacity: 0.5});
     })
   },
   { deep: true }
@@ -95,4 +96,5 @@ watch(
 </template>
 
 <style scoped>
+
 </style>
