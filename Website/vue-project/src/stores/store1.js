@@ -6,6 +6,7 @@ export const useStore1 = defineStore('store1', () => {
   const parameter = ref('txk')
   const messdatum = ref('2024-12-31')
   const bundesland = ref('')
+  const stationsname = ref('')
 
 
   const einheit = computed(() => {
@@ -37,9 +38,14 @@ export const useStore1 = defineStore('store1', () => {
     if (bundesland.value) {
     url.searchParams.set('bundesland', bundesland.value)
     }
-    return url.toString()
+    if (stationsname.value){
+    url.searchParams.set('stationsname', stationsname.value)
+    }
+    return url.toString() 
   })
 
+
+  
   const results = ref([])
   // Ergebnis-JSON von Flask holen
   async function fetchResults() {
@@ -49,5 +55,5 @@ export const useStore1 = defineStore('store1', () => {
 }
 
 
-  return { parameter,parameterbezeichnung, einheit, messdatum, bundesland, fundamentalurl, results, fetchResults}
+  return { parameter,parameterbezeichnung, einheit, messdatum, bundesland, stationsname, fundamentalurl, results, fetchResults}
 })

@@ -40,7 +40,12 @@
             </select>
         </p>
         <p>Stationen:
-            <input class ="eingabe" type="search" placeholder="Nach Station suchen...">
+            <input class ="eingabe" type="search" placeholder="Nach Station suchen..." v-model="store.stationsname">
+            <ul v-if="store.stationsname">
+                <li v-for="station in filteredStations" :key="station">
+                {{ station }}
+                </li>
+            </ul>
         </p>
         <div><p>Stationshöhe:</p>
             <div id="höhenblock">
@@ -68,8 +73,27 @@
 </template>
 
 <script setup>
+import { ref, computed } from 'vue'
 import { useStore1 } from '@/stores/store1'
 const store = useStore1()
+const stations = ref([])
+
+//Suche nach Stationen
+fetch('/stationsname.txt')
+  .then(r => r.text())
+  .then(t => {
+    stations.value = t.split('\n').filter(Boolean)
+  })
+
+const filteredStations = computed(() => {
+  const q = store.stationsname.toLowerCase()
+  if (q.length < 2) return []
+
+  return stations.value
+    .filter(s => s.toLowerCase().includes(q))
+    .slice(0, 10)
+})
+
 </script>
 
 <style scoped>

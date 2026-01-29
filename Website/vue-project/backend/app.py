@@ -90,10 +90,20 @@ def fundamentalsearch():
     sql.SQL("messwerte.mess_datum = %s")
 ]
     values = [messdatum]
+    
 
-    if bundesland:
+    if bundesland and not stationsname:
         conditions.append(sql.SQL("stationen.bundesland = %s"))
         values.append(bundesland)
+    
+    if stationsname and not bundesland:
+        conditions.append(sql.SQL("stationen.stationsname = %s"))
+        values.append(stationsname)
+    
+    if (bundesland and stationsname):
+        conditions.append(sql.SQL("(stationen.bundesland = %s OR stationen.stationsname = %s)"))
+        values.append(bundesland, stationsname)
+        
 
     query = sql.SQL("""
         SELECT
