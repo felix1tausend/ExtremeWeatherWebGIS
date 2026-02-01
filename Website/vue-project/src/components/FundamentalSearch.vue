@@ -65,13 +65,13 @@
         <h3>Werteingrenzung (optional)</h3>
         <div><p>Messwertebereich:</p>
             <div id="höhenblock">
-                <p class="höhentext"> über &nbsp; <input class ="eingabe2"> {{ store.einheit }}</p>
-                <p class="höhentext">unter <input class ="eingabe2"> {{ store.einheit }}</p>
+                <p class="höhentext"> über &nbsp; <input class ="eingabe2" v-model="store.untereschwelle"> {{ store.einheit }}</p>
+                <p class="höhentext">unter <input class ="eingabe2" v-model="store.obereschwelle"> {{ store.einheit }}</p>
             </div>
         </div>
     </div>
     <div id ="Listenbereich" class="bereich">
-    <button @click="store.fetchResults">Suchen
+    <button id = "button2" @click="store.fetchResults">Suchen
     </button>
         
     </div>
@@ -159,6 +159,26 @@ li:nth-of-type(1n+10) {
 ::placeholder {
     color: rgb(192, 190, 190);
     opacity: 1;
+}
+
+#button2{
+    position: relative;
+    float: right;
+    margin-top: 5%;
+    margin-right: 20%;
+    border-radius: 2px;
+    border-top: 2px groove #304b70;
+    border-bottom: 2px groove #304b70;
+    border-left: 2px groove #304b70;
+    background-color: #142d4c;
+    text-align: right;
+    color: #d9dbdd;
+    box-shadow: 0 1px 10px rgb(0, 0, 0);
+}
+
+#button2:hover {
+  background-color: rgb(56, 81, 112);
+  cursor: pointer;
 }
 
 

@@ -55,7 +55,7 @@ markerLayer = L.layerGroup().addTo(map)
 
 
 const baseMaps = { "OpenStreetMap": osm, "OpenTopoMap": otp, "Satellit": google, 'ESRI Street Map': esris, 'ESRI Topographic': esrit};
-const overlayMaps = { "Stationsmesswerte": { "Tagesmaximaltemperatur": markerLayer } }
+const overlayMaps = { "Stationsmesswerte": { 'Wetterstationen' :  markerLayer } }
 
 groupedLayerControl = L.control.groupedLayers(baseMaps, overlayMaps,{ 
   position: 'topright'}).addTo(map);
@@ -103,51 +103,74 @@ function getColorByValue(wert, einheit) {
     if (wert < 100)  return '#AD1457'
     return '#B71C1C'                 
   }}
- 
+
+  function ladeStationenohneWert(station){
+    const coords = station.geom
+
+    if (station.wert === -999) {
+      let popupText = "<b>" + station.stationsname + "</b><br>"
+                + store.parameterbezeichnung + ": keine Messung"
+
+      const circleMarker = L.circleMarker(
+      [coords.coordinates[1], coords.coordinates[0]],
+      {
+        radius: 7,
+        fillColor: getColorByValue(station.wert, store.einheit),
+        color: 'black',
+        weight: 0.5,
+        opacity: 0.4,
+        fillOpacity: 0.2,
+      }
+    ).bindPopup(popupText)
+
+    circleMarker.addTo(markerLayer)
+    }}
+
+
+  function ladeStationenmitWert(station){
+    const coords = station.geom
+
+    if  (station.wert != -999){
+      let popupText = "<b>"+ station.stationsname + "</b><br>"
+                + store.parameterbezeichnung + ":" + station.wert + store.einheit
+      
+      const circleMarker = L.circleMarker(
+      [coords.coordinates[1], coords.coordinates[0]],
+      { 
+        radius: 7,
+        fillColor: getColorByValue(station.wert, store.einheit),
+        color: 'black',
+        weight: 0.5,
+        opacity: 0.4,
+        fillOpacity: 0.8
+      }
+    ).bindPopup(popupText)
+
+    circleMarker.addTo(markerLayer)
+      }}
 
 
 watch(
-  () => props.stations,
-  (newStations) => {
+  function () {
+    return props.stations
+  },
+  function (newStations) {
     markerLayer.clearLayers()
-
-       newStations
-      .filter(station => station.wert === -999)
-      .forEach(station => {
-        const coords = station.geom
-        const circleMarker = L.circleMarker([coords.coordinates[1], coords.coordinates[0]], {
-          radius: 7,
-          fillColor: getColorByValue(station.wert, store.einheit),
-          color: 'black',
-          weight: 0.5,
-          opacity: 0.4,
-          fillOpacity: 0.2
-        }).bindPopup(`
-          <b>${station.stationsname}</b><br>
-          ${store.parameterbezeichnung}: keine Messung
-        `)
-        circleMarker.addTo(markerLayer)
-      })
-
-
-        newStations
-      .filter(station => station.wert !== -999)
-      .forEach(station => {
-        const coords = station.geom
-        const circleMarker = L.circleMarker([coords.coordinates[1], coords.coordinates[0]], {
-          radius: 7,
-          fillColor: getColorByValue(station.wert, store.einheit),
-          color: 'black',
-          weight: 0.5,
-          fillOpacity: 0.8
-        }).bindPopup(`
-          <b>${station.stationsname}</b><br>
-          ${store.parameterbezeichnung}: ${station.wert} ${store.einheit}
-        `)
-        circleMarker.addTo(markerLayer)
-      })  
+    for (let i = 0; i < newStations.length; i++) {
+      const station = newStations[i]
+      if (station.wert === -999) {
+        ladeStationenohneWert(station)
+      }
+    }
+    for (let i = 0; i < newStations.length; i++) {
+      const station = newStations[i]
+      if (station.wert !== -999) {
+        ladeStationenmitWert(station)
+      }
+    }
   },
   { deep: true }
+
 )
 </script>
 

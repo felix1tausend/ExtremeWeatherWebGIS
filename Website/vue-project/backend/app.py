@@ -81,7 +81,7 @@ def fundamentalsearch():
     höheunter = request.args.get("höheunter") #optional
     #Werteingrenzung
     untereschwelle = request.args.get("untereschwelle")#optional #Messwert soll größergleich einem angegebenen Schwellwert sein
-    obereschwelle = request.args.get("höheunter")#optional #Messwert soll kleinergleich einem angegebenen Schwellwert sein
+    obereschwelle = request.args.get("obereschwelle")#optional #Messwert soll kleinergleich einem angegebenen Schwellwert sein
     #Liste mit top 10 höchsten und niedrigsten Werten
 
     conn = db_connection()
@@ -112,6 +112,14 @@ def fundamentalsearch():
     if höheunter:
         conditions.append(sql.SQL("stationen.stationshoehe < %s"))
         values.append(int(höheunter))
+
+    if untereschwelle:
+        conditions.append(sql.SQL("messwerte.{column} > %s").format(column=sql.Identifier(parameter)))
+        values.append(int(untereschwelle))
+    if obereschwelle:
+        conditions.append(sql.SQL("messwerte.{column} < %s").format(column=sql.Identifier(parameter)))
+        values.append(int(obereschwelle))
+
         
 
     query = sql.SQL("""

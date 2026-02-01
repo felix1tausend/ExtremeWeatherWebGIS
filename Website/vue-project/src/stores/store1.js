@@ -2,7 +2,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 
-export const useStore1 = defineStore('store1', () => {
+export const useStore1 = defineStore('store1', function() {
   const parameter = ref('txk')
   const messdatum = ref('2024-12-31')
   const bundesland = ref('')
@@ -11,9 +11,11 @@ export const useStore1 = defineStore('store1', () => {
   const ausgewählteStationen = ref([]) // Ausgewählte Stationen, für welche ein Ergebnis geliefert werden soll
   const höheüber = ref('')
   const höheunter = ref('')
+  const untereschwelle = ref('')
+  const obereschwelle = ref('')
 
 
-  const einheit = computed(() => {
+  const einheit = computed(function() {
     switch (parameter.value) {
       case 'txk':
       case 'tnk': return '°C'
@@ -23,7 +25,7 @@ export const useStore1 = defineStore('store1', () => {
     }
   })
 
-  const parameterbezeichnung= computed(() => {
+  const parameterbezeichnung = computed(function(){
     switch (parameter.value) {
       case 'txk': return 'Tagesmaximaltemperatur'
       case 'tnk': return 'Tagenminimaltemperatur'
@@ -42,17 +44,19 @@ export const useStore1 = defineStore('store1', () => {
   }
 
   //Stationen filternund ausgewählte Stationen anzeigen
-const filteredStations = computed(() => {
-  const q = stationsname.value.toLowerCase()
-  let filtered = []
-  if (q.length >= 2) {
-    filtered = stationsliste.value.filter(s => s.toLowerCase().includes(q))
-  }
-  ausgewählteStationen.value.forEach(s => {
-    if (!filtered.includes(s)) filtered.push(s)
+  const filteredStations = computed(function() {
+    const q = stationsname.value.toLowerCase()
+    let filtered = []
+    if (q.length >= 2) {
+      filtered = stationsliste.value.filter(function(s) {
+        return s.toLowerCase().includes(q)
+      })
+    }
+    ausgewählteStationen.value.forEach(function(s) {
+      if (!filtered.includes(s)) filtered.push(s)
+    })
+    return filtered.slice(0, 10)
   })
-  return filtered.slice(0, 10)
-})
 
   // Station auswählen/deselektieren
   function toggleStation(station) {
@@ -65,7 +69,7 @@ const filteredStations = computed(() => {
   }
 
   //URL aus eingegebenen Daten zusammensetzen
-  const fundamentalurl = computed (()  => {
+  const fundamentalurl = computed (function(){
     const url = new URL('http://localhost:5000/api/fundamentalsearch/')
     url.searchParams.set('parameter', parameter.value)
     url.searchParams.set('messdatum', messdatum.value)
@@ -73,10 +77,14 @@ const filteredStations = computed(() => {
       url.searchParams.set('bundesland', bundesland.value)
     if (ausgewählteStationen.value.length > 0)
       url.searchParams.set('stationsnamen', ausgewählteStationen.value.join(','))
-    if (höheüber)
+    if (höheüber.value)
       url.searchParams.set('höheüber', höheüber.value)
-    if (höheunter)
+    if (höheunter.value)
       url.searchParams.set('höheunter', höheunter.value)
+    if (untereschwelle.value)
+      url.searchParams.set('untereschwelle', untereschwelle.value)
+    if (obereschwelle.value)
+      url.searchParams.set('obereschwelle', obereschwelle.value)
     return url.toString() 
   })
 
@@ -89,5 +97,5 @@ const filteredStations = computed(() => {
 
 }
 
-  return { parameter, parameterbezeichnung, einheit, messdatum, bundesland, stationsname, stationsliste, ausgewählteStationen, fetchStationnames, filteredStations, toggleStation, höheüber, höheunter, fundamentalurl, results, fetchResults}
+  return { parameter, parameterbezeichnung, einheit, messdatum, bundesland, stationsname, stationsliste, ausgewählteStationen, fetchStationnames, filteredStations, toggleStation, höheüber, höheunter, untereschwelle, obereschwelle, fundamentalurl, results, fetchResults}
 })

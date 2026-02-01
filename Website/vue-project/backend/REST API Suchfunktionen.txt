@@ -26,7 +26,6 @@ REST API Suchfunktionen
 
 
 
-
 Analyse:
 
 1 Alle Stationen, extremstes Jahr, Monat oder Woche für einen Messwert
