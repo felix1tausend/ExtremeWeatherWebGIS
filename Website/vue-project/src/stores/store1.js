@@ -41,6 +41,7 @@ export const useStore1 = defineStore('store1', () => {
     stationsliste.value = text.split('\n')
   }
 
+  //Stationen filternund ausgewählte Stationen anzeigen
 const filteredStations = computed(() => {
   const q = stationsname.value.toLowerCase()
   let filtered = []
@@ -72,9 +73,9 @@ const filteredStations = computed(() => {
       url.searchParams.set('bundesland', bundesland.value)
     if (ausgewählteStationen.value.length > 0)
       url.searchParams.set('stationsnamen', ausgewählteStationen.value.join(','))
-    if (höheüber.value)
+    if (höheüber)
       url.searchParams.set('höheüber', höheüber.value)
-    if (höheunter.value)
+    if (höheunter)
       url.searchParams.set('höheunter', höheunter.value)
     return url.toString() 
   })
@@ -88,5 +89,5 @@ const filteredStations = computed(() => {
 
 }
 
-  return { parameter, parameterbezeichnung, einheit, messdatum, bundesland, stationsname, stationsliste, ausgewählteStationen, fetchStationnames, filteredStations, toggleStation, fundamentalurl, results, fetchResults}
+  return { parameter, parameterbezeichnung, einheit, messdatum, bundesland, stationsname, stationsliste, ausgewählteStationen, fetchStationnames, filteredStations, toggleStation, höheüber, höheunter, fundamentalurl, results, fetchResults}
 })
