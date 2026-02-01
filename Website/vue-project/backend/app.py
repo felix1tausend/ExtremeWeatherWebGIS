@@ -40,7 +40,7 @@ def testmesswert():
         stationen.geolaenge,
         messwerte.{column}
     FROM messwerte
-    JOIN stationen
+    LEFT JOIN stationen
       ON messwerte.stations_id = stationen.stations_id
     WHERE messwerte.mess_datum = %s
     AND (stationen.bundesland like %s 
@@ -76,7 +76,7 @@ def fundamentalsearch():
     messdatum = request.args.get("messdatum")
     #räumliche Auswahl
     bundesland = request.args.get("bundesland") #optional
-    stationsname = request.args.get("stationsname") #optional
+    stationsnamen_raw = request.args.get("stationsnamen") #optional
     höheüber = request.args.get("höheüber") #optional
     höheunter = request.args.get("höheunter") #optional
     #Werteingrenzung
@@ -86,23 +86,32 @@ def fundamentalsearch():
 
     conn = db_connection()
     cur = conn.cursor()
-    conditions = [
-    sql.SQL("messwerte.mess_datum = %s")
-]
-    values = [messdatum]
-    
 
-    if bundesland and not stationsname:
+    conditions = []
+    values = [messdatum, messdatum]
+
+    stationsnamen = None
+    if stationsnamen_raw:
+        stationsnamen = stationsnamen_raw.split(",")  
+
+    if bundesland and not stationsnamen:
         conditions.append(sql.SQL("stationen.bundesland = %s"))
         values.append(bundesland)
     
-    if stationsname and not bundesland:
-        conditions.append(sql.SQL("stationen.stationsname = %s"))
-        values.append(stationsname)
+    if stationsnamen and not bundesland:
+        conditions.append(sql.SQL("stationen.stationsname = ANY(%s)"))
+        values.append(stationsnamen)
     
-    if (bundesland and stationsname):
-        conditions.append(sql.SQL("(stationen.bundesland = %s OR stationen.stationsname = %s)"))
-        values.append(bundesland, stationsname)
+    if bundesland and stationsnamen:
+        conditions.append(sql.SQL("(stationen.bundesland = %s OR stationen.stationsname = ANY(%s))"))
+        values.extend([bundesland, stationsnamen])
+
+    if höheüber:
+        conditions.append(sql.SQL("stationen.stationshoehe > %s"))
+        values.append(int(höheüber))
+    if höheunter:
+        conditions.append(sql.SQL("stationen.stationshoehe < %s"))
+        values.append(int(höheunter))
         
 
     query = sql.SQL("""
@@ -113,15 +122,16 @@ def fundamentalsearch():
             stationen.stationsname,
             stationen.bundesland,
             ST_AsGeoJSON(stationen.geom) AS geom,
-            messwerte.mess_datum,
-            messwerte.{column}
-        FROM messwerte
-        JOIN stationen
-        ON messwerte.stations_id = stationen.stations_id
+            COALESCE(messwerte.mess_datum, %s) AS mess_datum,
+            COALESCE(messwerte.{column}, -999) AS wert
+        FROM stationen
+        LEFT JOIN messwerte
+        ON stationen.stations_id = messwerte.stations_id
+        AND messwerte.mess_datum = %s
         WHERE {conditions}
     """).format(
         column=sql.Identifier(parameter),
-        conditions=sql.SQL(" AND ").join(conditions)
+        conditions=sql.SQL(" AND ").join(conditions) if conditions else sql.SQL("TRUE")
     )
     
     cur.execute(query, values)

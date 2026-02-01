@@ -21,6 +21,7 @@
         <h3>Räumliche Auswahl (optional) </h3>
         <p>Bundesland:
             <select id="Bundeslandeingabe" class ="eingabe" v-model="store.bundesland" >
+                <option>-</option>
                 <option>Baden-Württemberg</option>
                 <option>Bayern</option>
                 <option>Berlin</option>
@@ -41,16 +42,22 @@
         </p>
         <p>Stationen:
             <input class ="eingabe" type="search" placeholder="Nach Station suchen..." v-model="store.stationsname">
-            <ul v-if="store.stationsname">
-                <li v-for="station in filteredStations" :key="station">
-                {{ station }}
+            <ul id = "ul1" v-if="store.filteredStations.length">
+                <li v-for="station in store.filteredStations" :key="station" >
+                <label>
+                    <input type="checkbox" 
+                        :value="station"
+                        :checked="store.ausgewählteStationen.includes(station)"
+                        @change="store.toggleStation(station)">
+                    {{ station }}
+                </label>
                 </li>
             </ul>
         </p>
         <div><p>Stationshöhe:</p>
             <div id="höhenblock">
-                <p class="höhentext"> über &nbsp; <input class ="eingabe2"> m</p>
-                <p class="höhentext">unter <input class ="eingabe2"> m</p>
+                <p class="höhentext"> über &nbsp; <input class ="eingabe2" v-model="store.höheüber"> m</p>
+                <p class="höhentext">unter <input class ="eingabe2" v-model="store.höheunter"> m</p>
             </div>
         </div>
     </div>
@@ -73,36 +80,24 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { onMounted } from 'vue'
 import { useStore1 } from '@/stores/store1'
+
 const store = useStore1()
-const stations = ref([])
 
-//Suche nach Stationen
-fetch('/stationsname.txt')
-  .then(r => r.text())
-  .then(t => {
-    stations.value = t.split('\n').filter(Boolean)
-  })
-
-const filteredStations = computed(() => {
-  const q = store.stationsname.toLowerCase()
-  if (q.length < 2) return []
-
-  return stations.value
-    .filter(s => s.toLowerCase().includes(q))
-    .slice(0, 10)
+onMounted(() => {
+  store.fetchStationnames()
 })
 
 </script>
 
 <style scoped>
 .fundamental-search {
-  height: 100%;
-  width: 100%;
-  margin: 0px;
-  padding: 0.5em;
-  font-family: 'Ubuntu', system-ui, sans-serif;
+    height: 100%;
+    width: 100%;
+    margin: 0px;
+    padding: 0.5em;
+    font-family: 'Ubuntu', system-ui, sans-serif;
 }
 
 h2{
@@ -120,6 +115,18 @@ h2{
     border-radius: 2px;
     color: white;
 }
+
+#ul1 {
+    margin: 5px;
+    margin-left: 20%;
+    display: grid;
+    flex-direction: column;
+    justify-content: left;
+}
+
+li:nth-of-type(1n+10) {
+    display: none;
+} 
 
 .eingabe2{
     float: center;
@@ -150,8 +157,10 @@ h2{
 }
 
 ::placeholder {
-  color: rgb(192, 190, 190);
-  opacity: 1;
+    color: rgb(192, 190, 190);
+    opacity: 1;
 }
+
+
 
 </style>
