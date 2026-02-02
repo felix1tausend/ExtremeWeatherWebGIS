@@ -42,7 +42,7 @@ Arnis
 Arnsberg
 Arnstein-Müdesheim
 Arolsen-Neu Berich
-Arolsen-Volkhardinghausen, Bad
+Arolsen-Volkhardinghausen Bad
 Artern
 Aschaffenburg
 Aschersleben
@@ -64,14 +64,14 @@ Bargischow-Gnevezin
 Barsinghausen-Hohenbostel
 Barth
 Baruth
-Kubschütz, Kreis Bautzen
+Kubschütz Kreis Bautzen
 Heinersreuth-Vollhof
 Bayrischzell
 Beckum-Unterberg
 Bederkesa
 Oberzent-Beerfelden
 Behrensdorf
-Bellingen, Bad
+Bellingen Bad
 Belm
 Bendorf
 Benneckenstein
@@ -80,10 +80,10 @@ Bensheim
 Berchtesgaden (KKst)
 Berg/Oberpfalz
 Bergen
-Bergzabern, Bad
-Berka, Bad (Flugplatz)
-Berleburg, Bad
-Berleburg, Bad-Stünzel
+Bergzabern Bad
+Berka Bad (Flugplatz)
+Berleburg Bad
+Berleburg Bad-Stünzel
 Berlin-Adlershof
 Berlin-Alexanderplatz
 Berlin-Buch
@@ -108,14 +108,14 @@ Berlin-Treptow
 Berlin-Zehlendorf
 Bernburg/Saale (Nord)
 Bernkastel-Kues
-Bertrich, Bad
+Bertrich Bad
 Berus
 Warthausen-Birkenhard
 Biedenkopf-Wallau
 Bischbrunn-Oberndorf
 Bischofsgrün
 Bitterfeld
-Blankenburg, Bad
+Blankenburg Bad
 Blankenrath
 Bobeck
 Bocholt (Marienschule)
@@ -127,7 +127,7 @@ Böhming
 Boffzen
 Boizenburg
 Bokel
-Boll, Bad (KKst)
+Boll Bad (KKst)
 Boltenhagen
 Bonn
 Bonn-Friesdorf
@@ -169,7 +169,7 @@ Brotterode
 Brücken
 Brüggen (Flugplatz)
 Brunsbüttel (Schleuse)
-Buchen, Kreis Neckar-Odenwald
+Buchen Kreis Neckar-Odenwald
 Buchenbach
 Rosengarten-Klecken
 Büchel-Alflen
@@ -193,7 +193,7 @@ Algermissen-Groß Lobke
 Clausthal-Zellerfeld
 Cloppenburg
 Lautertal-Oberlauter
-Colberg, Bad
+Colberg Bad
 Collmberg
 Cottbus (Flugplatz)
 Cottbus
@@ -222,7 +222,7 @@ Dillingen/Donau
 Dillingen/Donau-Fristingen
 Dippoldiswalde-Reinberg
 Dobel
-Doberan, Bad-Heiligendamm
+Doberan Bad-Heiligendamm
 Doberlug-Kirchhain
 Dobra
 Döbeln
@@ -238,12 +238,12 @@ Dresden-Klotzsche
 Dresden-Hosterwitz
 Dresden-Strehlen
 Möckern-Drewitz
-Driburg, Bad
+Driburg Bad
 Duderstadt
-Dürkheim, Bad
-Dürkheim, Bad (Saline)
-Dürrenberg, Bad
-Dürrheim, Bad
+Dürkheim Bad
+Dürkheim Bad (Saline)
+Dürrenberg Bad
+Dürrheim Bad
 Düsseldorf
 Düsseldorf-Südfriedhof
 Duisburg-Friemersheim
@@ -269,13 +269,13 @@ Ellwangen-Rindelbach
 Elpersbüttel
 Elsdorf/Erftkreis
 Elsfleth
-Elster, Bad-Sohl
+Elster Bad-Sohl
 Elzach-Fisnacht
 Emden-Nesserland
 Emden-Wolthusen
 Emmendingen-Mundingen
 UFS TW Ems
-Ems, Bad
+Ems Bad
 Engelskirchen
 Engen/Hegau
 Eningen
@@ -299,7 +299,7 @@ Eslohe
 Essen-Bredeney
 Weilerswist-Lommersum
 Eutin
-Falkenberg,Kr.Rottal-Inn
+Falkenberg Kr.Rottal-Inn
 Faßberg
 Fehmarnbelt
 Feldberg
@@ -315,7 +315,7 @@ Flensburg (Schäferhaus)
 Flensburg-Mürwik
 Flossenbürg
 Frammersbach
-Frankenhausen, Bad/Kyffhäuser
+Frankenhausen Bad/Kyffhäuser
 Birx/Rhön
 Frankfurt (07W)
 Frankfurt (18W)
@@ -376,7 +376,7 @@ Görlitz
 Gößweinstein
 Göttingen
 Goldberg
-Gottleuba, Bad
+Gottleuba Bad
 Gräfenberg-Kasberg
 Grainet-Rehberg
 Grambek
@@ -398,9 +398,9 @@ Großmehring-Theißing
 Großwechsungen
 Gründau-Breitenborn
 Grünow
-Grund, Bad
-Grund, Bad (Erzbergwerk)
-Gschwend, Kreis Ostalb
+Grund Bad
+Grund Bad (Erzbergwerk)
+Gschwend Kreis Ostalb
 Günzburg
 Güstrow-Schabernack
 Rheda-Wiedenbrück-Lintel
@@ -426,7 +426,7 @@ Hanau
 Hankensbüttel
 Hannover
 Harburg
-Harzburg, Bad
+Harzburg Bad
 Harzgerode
 Haseldorf
 Hasselfelde
@@ -445,15 +445,15 @@ Helgoland-Düne
 Heinsberg-Schleiden
 Helgoland
 Helmstedt
-Helse, Kreis Dithmarschen
+Helse Kreis Dithmarschen
 Herford
 Herleshausen
-Herrenalb, Bad
+Herrenalb Bad
 Herrenberg
 Herrenhof
 Herrnhut
 Niederwörresbach
-Hersfeld, Bad
+Hersfeld Bad
 Herten
 Herzberg
 Hiddensee-Vitte
@@ -482,7 +482,7 @@ Hohwacht
 Holzdorf-Bernsdorf
 Holzhausen a.d. Haide
 Holzkirchen
-Bevern, Kreis Holzminden
+Bevern Kreis Holzminden
 Holzminden-Silberborn
 Homberg/Ohm
 Homburg/Saar
@@ -490,7 +490,7 @@ Hopsten (Flugplatz)
 Horlachen
 Hornisgrinde
 Hottingen
-Hoyerswerda, Kreis Bautzen
+Hoyerswerda Kreis Bautzen
 Hüll
 Hümmerich
 Husum
@@ -524,7 +524,7 @@ Kaisheim-Neuhof
 Kalifornien
 Kalkar
 Kall-Sistig
-Heiligenstadt, Heilbad-Kalteneber
+Heiligenstadt Heilbad-Kalteneber
 Kaltennordheim
 Kamenz
 Karlshuld
@@ -541,7 +541,7 @@ Kiel-Kronshagen
 Waging am See-Schnöbling
 Kirchberg/Jagst-Herboldshausen
 Kirchdorf/Poel
-Kissingen, Bad
+Kissingen Bad
 Kitzingen
 Kleiner Feldberg/Taunus
 Klein Rönnau
@@ -551,30 +551,30 @@ Schipkau-Klettwitz
 Kleve
 Klippeneck
 Klitzschen bei Torgau
-Klosterlausnitz, Bad
+Klosterlausnitz Bad
 Knittlingen
 Koblenz
 Koblenz-Horchheim
 Kölleda
 Köln-Botanischer Garten
 Köln/Bonn
-Königshofen, Bad
+Königshofen Bad
 Königsmoor
 Königsmoos-Untermaxfeld
 Königstein/Taunus
 Könnern
 Kösching
-Kösen, Bad
+Kösen Bad
 Köterberg
 Köthen (Anhalt)
-Kohlgrub, Bad (Rosshof)
+Kohlgrub Bad (Rosshof)
 Konstanz
 Konstanz (Stadtgärtnerei)
 Korbach-Lengefeld
 Kreuth
 Kronach
-Krozingen, Bad
-Krozingen, Bad-Hausen
+Krozingen Bad
+Krozingen Bad-Hausen
 Krüssau
 Krumbach-Edenhausen
 Kükels
@@ -593,13 +593,13 @@ Landsberg (Flugplatz)
 Landsberg/Lech
 Landshut
 Langenlipsdorf
-Langensalza, Bad
+Langensalza Bad
 Langeoog
 Lathen
-Lauchstädt, Bad
+Lauchstädt Bad
 Lauda-Königshofen-Gerlachsheim
 Laupheim
-Lauterberg, Bad (A)
+Lauterberg Bad (A)
 Lautertal-Hörgenau
 Lechfeld
 Leck (A)
@@ -623,7 +623,7 @@ Leuchtturm Kiel
 Leunawerke
 Köln-Stammheim
 Lichtenhain-Mittelndorf
-Liebenzell, Bad
+Liebenzell Bad
 Liliental
 Limburg/Lahn-Offheim
 Limburgerhof
@@ -632,10 +632,10 @@ Lindenberg/Allgäu
 Lindenfels
 Lindenfels-Winterkasten
 Lingen
-Lippspringe, Bad
+Lippspringe Bad
 Lippstadt-Bökenförde
 List auf Sylt
-Lobenstein, Bad
+Lobenstein Bad
 Löhnberg-Obershausen
 Löningen
 Löningen-Hagel
@@ -659,14 +659,14 @@ Mainhardt-Ziegelbronn
 Mainz-Lerchenberg (ZDF)
 Mainz-Finthen
 Maisach-Gernlinden
-Malente, Bad-Gremsmühlen
+Malente Bad-Gremsmühlen
 Mallersdorf-Pfaffenberg-Oberlindhart
 Manderscheid-Sonnenhof
 Manschnow
 Vatterode-Gräfenstuhl
-Cölbe, Kreis Marburg-Biedenkopf
+Cölbe Kreis Marburg-Biedenkopf
 Marienberg
-Marienberg, Bad
+Marienberg Bad
 Marienleuchte
 Markt Erlbach-Hagenhofen
 Marnitz
@@ -676,7 +676,7 @@ Mayen
 Meerbeck
 Meersburg
 Aschersleben-Mehringen
-Meinberg, Bad
+Meinberg Bad
 Meinerzhagen (A)
 Meiningen
 Klipphausen-Garsebach
@@ -687,7 +687,7 @@ Mendig
 Sankt Blasien-Menzenschwand
 Meppen
 Merdingen
-Mergentheim, Bad
+Mergentheim Bad
 Mespelbrunn
 Meßstetten-Appental
 Metten
@@ -722,13 +722,13 @@ Münsingen-Apfelstetten
 Münster
 Leutenberg-Steinsdorf
 Murrhardt
-Muskau, Bad
-Nauheim, Bad
+Muskau Bad
+Nauheim Bad
 Neubrandenburg
 Neuburg
 Neuburg/Kammel-Langenhaslach
 Neudenau
-Neuenahr, Bad-Ahrweiler
+Neuenahr Bad-Ahrweiler
 Neuenburg-Zinken
 Stechlin-Menz
 Neuhaus am Rennweg
@@ -839,10 +839,10 @@ Raisting
 Rastatt
 Rastenberg
 Rauschberg bei Ruhpolding
-Weingarten, Kreis Ravensburg
+Weingarten Kreis Ravensburg
 Recklinghausen
 Regensburg
-Reichenhall, Bad
+Reichenhall Bad
 Reichshof-Eckenhagen
 Marienberg-Reitzenhain
 Remetschwiel
@@ -855,7 +855,7 @@ Rheinau-Memprechtshofen
 Rheine-Bentlage
 Rheinfelden
 Rheinstetten
-Altheim, Kreis Biberach
+Altheim Kreis Biberach
 Rodewisch
 Roding-Wetterfeld Schlüchtern
 Röhrigshof
@@ -869,11 +869,11 @@ Roth bei Nürnberg
 Roth bei Prüm
 Roth
 Rothenburg ob der Tauber
-Rothenfelde, Bad
+Rothenfelde Bad
 Rottach-Egern
 Rottenburg-Kiebingen
 Rottweil
-Kreuznach, Bad
+Kreuznach Bad
 Ruhpolding
 Ruhwinkel
 Ruppertsecken
@@ -886,13 +886,13 @@ Saarbrücken-Ensheim
 Saarbrücken (Wasserwerk)
 Saarbrücken-Sankt Johann
 Saarlouis
-Sachsa, Bad
+Sachsa Bad
 Sachsenheim
-Säckingen, Bad (Bergseestr.)
+Säckingen Bad (Bergseestr.)
 Saldenburg-Entschenreuth
 Salzgitter-Ringelheim
 Salzhemmendorf-Lauenstein
-Salzuflen, Bad
+Salzuflen Bad
 Salzwedel
 Sandberg
 Sankt Blasien
@@ -901,7 +901,7 @@ Sankt Michaelisdonn
 Sankt Peter-Ording
 Sankt Wendel-Hof
 Sankt Wendel-Urweiler
-Sassendorf, Bad-Ostinghausen
+Sassendorf Bad-Ostinghausen
 Schaafheim-Schlierbach
 Schallstadt-Mengen
 Schauinsland (UBA)
@@ -922,14 +922,14 @@ Schluchsee
 Schlüchtern-Kloster Gomfritz
 Schlüchtern-Herolz
 Schmalenbeck
-Schmalkalden, Kurort
+Schmalkalden Kurort
 Schmatzfeld
 Schmelz-Hüttersdorf
-Schmiedeberg, Bad
+Schmiedeberg Bad
 Schmücke
 Schnarrtanne-Vogelsgrün
 Schneifelforsthaus
-Schömberg, Kreis Calw
+Schömberg Kreis Calw
 Schönwald/Ofr.-Brunn
 Schönwald/Schwarzwald
 Schonach
@@ -942,7 +942,7 @@ Schwäbisch Gmünd-Strassdorf
 Schwäbisch Hall-Bibersfeld
 Schwäbisch Gmünd (Wind)
 Schwaigermoos
-Schwalbach, Bad
+Schwalbach Bad
 Schwandorf
 Schwanebeck
 Schwangau-Horn
@@ -955,7 +955,7 @@ Schwesing
 Seehausen
 Seelscheid
 Seesen
-Segeberg, Bad
+Segeberg Bad
 Selb/Selbbach
 Selb/Oberfranken-Wildenau
 Selbach (Tholey)
@@ -975,14 +975,14 @@ Soltau
 Sondershausen
 Sonneberg-Neufang
 Sontra
-Sooden-Allendorf, Bad
+Sooden-Allendorf Bad
 Speinshart
 Spören-Prussendorf
 Stadtilm
-Staffelstein, Bad-Stublang
+Staffelstein Bad-Stublang
 Stammbach-Querenbach
 Stegen
-Steinau, Kreis Cuxhaven
+Steinau Kreis Cuxhaven
 Steinberg
 Mittelnkirchen-Hohenfelde
 Oberharz am Brocken-Stiege
@@ -999,7 +999,7 @@ Stuttgart (Schnarrenberg)
 Stuttgart (Schnarrenberg Aero)
 Stuttgart-Echterdingen
 Stuttgart-Hohenheim
-Suderode, Bad
+Suderode Bad
 Sülzhayn
 Süpplingen
 Sundhausen
@@ -1019,7 +1019,7 @@ Tirschenreuth-Lodermühl
 Titisee-Neustadt-Langenordnach
 Titisee-Neustadt-Titisee
 Todtmoos
-Tölz, Bad
+Tölz Bad
 Tönisvorst
 Torfhaus im Solling
 Torgau
@@ -1071,7 +1071,7 @@ Waldems-Reinborn
 Waldhäuser (National Park)
 Waldhof (Lüneburger Heide)
 Waldsassen
-Waldsee, Bad-Reute
+Waldsee Bad-Reute
 Waldshut
 Walldürn
 Waltershausen
@@ -1083,7 +1083,7 @@ Wasserburg
 Wasserkuppe
 Watzmannhaus
 Weiden
-Weidenbach, Kreis Ansbach
+Weidenbach Kreis Ansbach
 Weigenheim-Reusch
 Weihenstephan-Dürnast
 Weilburg (Kläranlage)
@@ -1103,7 +1103,7 @@ Wellendingen
 Wellmitz
 Wendelstein
 Werl
-Mühlhausen, Kreis Schweinfurt
+Mühlhausen Kreis Schweinfurt
 Wernigerode
 Wertheim-Eichel
 Westerland
@@ -1114,15 +1114,15 @@ Wielenbach (Demollstr.)
 Wiesbaden-Auringen
 Wiesbaden-Dotzheim
 Wiesenburg
-Wildbad, Bad-Calmbach
-Wildbad, Bad-Sommerberg
+Wildbad Bad-Calmbach
+Wildbad Bad-Sommerberg
 Neubulach-Oberhaugstett
 Wildenrath
-Wildungen, Bad
+Wildungen Bad
 Wilhelmshaven
 Willingen/Upland
 Willingen/Upland-Usseln
-Winterbach, Rems-Murr-Kreis
+Winterbach Rems-Murr-Kreis
 Winterberg
 Wismar
 Wittenberg
@@ -1170,7 +1170,7 @@ Fürstenzell
 Hahn
 Putlos
 Kirchheim/Teck-Ötlingen
-Kohlgrub, Bad (A)
+Kohlgrub Bad (A)
 Ludwigsburg
 Mainburg
 Mannheim
@@ -1210,7 +1210,7 @@ Westerland (Wind)
 Wilhelmshaven (Flugplatz)
 Nastätten
 Rotenburg (Wümme) (Flugplatz)
-Münster am Stein, Bad
+Münster am Stein Bad
 Selb-Spielberg
 Lügde-Paenbruch
 Steinhagen-Negast
@@ -1234,7 +1234,7 @@ Singen
 Brilon-Thülen
 Wusterwitz
 Huy-Pabstorf
-Salzungen, Bad-Gräfen-Nitzendorf
+Salzungen Bad-Gräfen-Nitzendorf
 Demker
 Notzingen
 Wolfsburg (Schleuse)
@@ -1310,7 +1310,7 @@ Helmstedt-Emmerstedt
 Altenberg-Raupennest
 Pößneck
 Wehnde
-Soden,Bad-Salmünster (Kläranlage)
+SodenBad-Salmünster (Kläranlage)
 Haltern (Wasserwerk)
 Nordseeboje 2
 Zwickau-Stadt
@@ -1342,7 +1342,7 @@ Fronberg (Schwandorf)
 Pirmasens (Kläranlage)
 St. Tönis
 Krefeld-Mitte
-Brückenau, Bad (Elisabethenhof)
+Brückenau Bad (Elisabethenhof)
 Ober-Olm/Bellem
 Sembach
 Sargenroth
@@ -1356,12 +1356,12 @@ Oberschleißheim/Flugplatz
 Schmalkalden
 Schmiedefeld/Rennsteig
 Finsterbergen
-Sulza, Bad
-Liebenstein, Bad
+Sulza Bad
+Liebenstein Bad
 Lucka
 Reinheim-Hundertmorgen
 Bonndorf
-Urach, Bad/Erms
+Urach Bad/Erms
 Enzklösterle/Schwarzwald
 Königsfeld
 Cämmerswalde-Rauschenbach

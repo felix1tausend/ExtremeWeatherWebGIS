@@ -21,8 +21,35 @@ html, body {
 .leaflet-top.leaflet-right {
   top: 5vh;
 }
+
+
 .leaflet-control-layers {
   font-family: 'Ubuntu', sans-serif;
   background-color: rgba(20, 45, 76, 0.95);
   color: #fff;
+}
+
+.legend {
+  width: 150px;
+  background: white;
+  padding: 8px 10px;
+  font-size: 12px;
+  line-height: 1.4;
+  border-radius: 4px;
+  box-shadow: 0 0 5px rgba(0,0,0,0.3);
+  text-align: center;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  padding: 2px;
+}
+
+.legend-color {
+  width: 14px;
+  height: 14px;
+  margin-right: 6px;
+  border: 1px solid #555;
+  padding: 3px;
 }

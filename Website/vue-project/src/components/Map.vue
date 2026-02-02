@@ -10,6 +10,7 @@ let map
 let markerLayer
 let osm, google, otp, esris, esrit
 let groupedLayerControl
+let legendControl
 
 const props = defineProps({
   stations: {
@@ -19,7 +20,7 @@ const props = defineProps({
 })
 
 
-onMounted(async() => {
+onMounted(async function() {
 
 
   map = L.map('map',{
@@ -28,31 +29,29 @@ onMounted(async() => {
   zoomControl: false, 
   });
 
-  osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19,
-    attribution: '&copy; OpenStreetMap contributors'
-  });
+  addLegend(store.einheit)
 
+  osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 19,
+  attribution: '&copy; OpenStreetMap contributors'
+  });
   otp = L.tileLayer('https://tile.opentopomap.org/{z}/{x}/{y}.png', {
   maxZoom: 19,
-  attribution: 'OpenTopoMap'});
-
-  google = L.tileLayer('http://mt0.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}', {
-    maxZoom: 19,
-    attribution: 'google'
+  attribution: 'OpenTopoMap'
   });
-
+  google = L.tileLayer('http://mt0.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}', {
+  maxZoom: 19,
+  attribution: 'google'
+  });
   esris = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',{ 
   maxZoom: 19,
-  attribution: 'Tiles &copy; Esri &mdash; Street Map' });
-
-
+  attribution: 'Tiles &copy; Esri &mdash; Street Map' 
+  });
   esrit = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
   attribution: 'Tiles &copy; Esri &mdash; Topographic'
-}).addTo(map);
+  }).addTo(map);
 
 markerLayer = L.layerGroup().addTo(map)
-
 
 const baseMaps = { "OpenStreetMap": osm, "OpenTopoMap": otp, "Satellit": google, 'ESRI Street Map': esris, 'ESRI Topographic': esrit};
 const overlayMaps = { "Stationsmesswerte": { 'Wetterstationen' :  markerLayer } }
@@ -60,8 +59,93 @@ const overlayMaps = { "Stationsmesswerte": { 'Wetterstationen' :  markerLayer } 
 groupedLayerControl = L.control.groupedLayers(baseMaps, overlayMaps,{ 
   position: 'topright'}).addTo(map);
 
-L.control.zoom({position: 'bottomright'}).addTo(map);
 })
+
+function getLegendItems(einheit) {
+  if (einheit === '°C') {
+    return [
+      { color: 'lightgray', label: 'keine Daten' },
+      { color: '#360259', label: '< -30 °C' },
+      { color: '#00305A', label: '-30 bis -20 °C' },
+      { color: '#0288D1', label: '-20 bis -10 °C' },
+      { color: '#0EEAFF', label: '-10 bis 0 °C' },
+      { color: '#45BF55', label: '0 bis 10 °C' },
+      { color: '#FFE11A', label: '10 bis 20 °C' },
+      { color: '#F2B705', label: '20 bis 30 °C' },
+      { color: '#D23600', label: '30 bis 40 °C' },
+      { color: '#440505', label: '> 40 °C' }
+    ]
+  }
+
+  if (einheit === 'm/s') {
+    return [
+      { color: 'lightgray', label: 'keine Daten' },
+      { color: '#FFFFFF', label: '< 0.3 (Bft 0)' },
+      { color: '#FFFFFF', label: '0.3 bis 1.6 (Bft 1)' },
+      { color: '#81D4FA', label: '1.6 bis 3.4 (Bft 2)' },
+      { color: '#4FC3F7', label: '3.4 bis 5.5 (Bft 3)' },
+      { color: '#4CAF50', label: '5.5 bis 8.0 (Bft 4)' },
+      { color: '#CDDC39', label: '8.0 bis 10.8 (Bft 5)' },
+      { color: '#FFEB3B', label: '10.8 bis 13.9 (Bft 6)' },
+      { color: '#FFC107', label: '13.9 bis 17.2 (Bft 7)' },
+      { color: '#FF9800', label: '17.2 bis 20.8 (Bft 8)' },
+      { color: '#F44336', label: '20.8 bis 24.5 (Bft 9)' },
+      { color: '#D32F2F', label: '24.5 bis 28.5 (Bft 10)' },
+      { color: '#7B1FA2', label: '28.5 bis 32.7 (Bft 11)' },
+      { color: '#4A148C', label: '> 32.7 (Bft 12)' }
+    ]
+  }
+
+  if (einheit === 'mm') {
+    return [
+      { color: 'lightgray', label: 'keine Daten' },
+      { color: '#FFFFFF', label: '< 0.1 mm' },
+      { color: '#E3F2FD', label: '0.1 bis 1 mm' },
+      { color: '#90CAF9', label: '1 bis 5 mm' },
+      { color: '#42A5F5', label: '5 bis 10 mm' },
+      { color: '#1E88E5', label: '10 bis 20 mm' },
+      { color: '#1565C0', label: '20 bis 30 mm' },
+      { color: '#6A1B9A', label: '30 bis 50 mm' },
+      { color: '#AD1457', label: '50 bis 100 mm' },
+      { color: '#B71C1C', label: '> 100 mm' }
+    ]
+  }
+
+  return []
+}
+function addLegend(einheit) {
+  if (legendControl) {
+    map.removeControl(legendControl)
+  }
+
+  legendControl = L.control({ position: 'bottomright' })
+
+  legendControl.onAdd = function () {
+    const div = L.DomUtil.create('div', 'legend')
+    const items = getLegendItems(einheit)
+
+    div.innerHTML = `<strong>Legende</strong><br>`
+
+    items.forEach( function (item) {
+      div.innerHTML +=
+        `<div class="legend-item">
+          <span class="legend-color" style="background:${item.color}"></span>
+          ${item.label}
+        </div>`
+    })
+
+    return div
+  }
+
+  legendControl.addTo(map)
+}
+
+watch(
+  () => store.einheit,
+  (newEinheit) => {
+    addLegend(newEinheit)
+  }
+)
 
 function getColorByValue(wert, einheit) {
   if (einheit === '°C') {
@@ -79,6 +163,7 @@ function getColorByValue(wert, einheit) {
   if (einheit === 'm/s') {
     if (wert === -999) return 'lightgray' //keine Daten
     if (wert < 0.3)  return '#FFFFFF'  // Bft 0 
+    if (wert < 1.6)  return '#B0E1F7'  // Bft 1
     if (wert < 3.4)  return '#81D4FA'  // Bft 2
     if (wert < 5.5)  return '#4FC3F7'  // Bft 3
     if (wert < 8.0)  return '#4CAF50'  // Bft 4
@@ -132,7 +217,9 @@ function getColorByValue(wert, einheit) {
 
     if  (station.wert != -999){
       let popupText = "<b>"+ station.stationsname + "</b><br>"
-                + store.parameterbezeichnung + ":" + station.wert + store.einheit
+                + store.parameterbezeichnung + ": " + "<b>" + station.wert + " " + store.einheit + "</b>" + "<br>"
+                + "Stationshöhe: " + station.stationshoehe + " m" + "<br>"
+                + "Standort: " + coords.coordinates[1] + " N" + " " + coords.coordinates[0] + " O"
       
       const circleMarker = L.circleMarker(
       [coords.coordinates[1], coords.coordinates[0]],

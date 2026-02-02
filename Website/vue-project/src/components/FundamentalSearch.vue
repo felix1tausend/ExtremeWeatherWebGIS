@@ -14,8 +14,6 @@
         <p>Datum:
             <input id="datumseingabe" class ="eingabe" type="date"  min="1950-01-01" max="2024-12-31" v-model="store.messdatum">
         </p>
-        
-
     </div>
     <div id="Raumauswahl" class="bereich">
         <h3>Räumliche Auswahl (optional) </h3>
@@ -55,40 +53,37 @@
             </ul>
         </p>
         <div><p>Stationshöhe:</p>
-            <div id="höhenblock">
-                <p class="höhentext"> über &nbsp; <input class ="eingabe2" v-model="store.höheüber"> m</p>
-                <p class="höhentext">unter <input class ="eingabe2" v-model="store.höheunter"> m</p>
+            <div class="werteingrenzung">
+                <p class="eingrenzungstext"> über &nbsp; <input class ="eingabe2" v-model="store.höheüber"> m</p>
+                <p class="eingrenzungstext">unter <input class ="eingabe2" v-model="store.höheunter"> m</p>
             </div>
         </div>
     </div>
     <div id = "Werteingrenzung" class="bereich">
         <h3>Werteingrenzung (optional)</h3>
         <div><p>Messwertebereich:</p>
-            <div id="höhenblock">
-                <p class="höhentext"> über &nbsp; <input class ="eingabe2" v-model="store.untereschwelle"> {{ store.einheit }}</p>
-                <p class="höhentext">unter <input class ="eingabe2" v-model="store.obereschwelle"> {{ store.einheit }}</p>
+            <div class="werteingrenzung">
+                <p class="eingrenzungstext"> über &nbsp; <input class ="eingabe2" v-model="store.untereschwelle"> {{ store.einheit }}</p>
+                <p class="eingrenzungstext">unter <input class ="eingabe2" v-model="store.obereschwelle"> {{ store.einheit }}</p>
             </div>
         </div>
     </div>
-    <div id ="Listenbereich" class="bereich">
-    <button id = "button2" @click="store.fetchResults">Suchen
-    </button>
-        
+    <div id ="unterenavbar">
+        <ul>
+            <li class = "buttonli"> <button id = "button2" @click="store.fetchResults">Suchen </button></li>
+            <li class = "buttonli"> <button id = "button3"> <b>!!!</b></button> </li>
+        </ul>   
     </div>
-
   </div>
 </template>
 
 <script setup>
 import { onMounted } from 'vue'
 import { useStore1 } from '@/stores/store1'
-
 const store = useStore1()
-
 onMounted(() => {
   store.fetchStationnames()
 })
-
 </script>
 
 <style scoped>
@@ -137,14 +132,14 @@ li:nth-of-type(1n+10) {
     color: white;
 }
 
-#höhenblock{
+.werteingrenzung{
     display: grid;
     justify-content: right;
     margin-right: 5%;
 
 }
 
-.höhentext{
+.eingrenzungstext{
     margin-bottom: 10px;
     margin-top: 0px;
     width: max-content;
@@ -161,25 +156,36 @@ li:nth-of-type(1n+10) {
     opacity: 1;
 }
 
+
+#unterenavbar{
+    display: flex;
+    justify-content: right; 
+    margin-right: 5%;
+}
+
+
 #button2{
-    position: relative;
-    float: right;
-    margin-top: 5%;
-    margin-right: 20%;
+    height: 40px;
+    width: 100px;
+    margin-right: 10px;
     border-radius: 2px;
-    border-top: 2px groove #304b70;
-    border-bottom: 2px groove #304b70;
-    border-left: 2px groove #304b70;
+    border: 2px groove #304b70;
     background-color: #142d4c;
-    text-align: right;
+    font-size: large;
+    text-align: center;
     color: #d9dbdd;
-    box-shadow: 0 1px 10px rgb(0, 0, 0);
 }
 
 #button2:hover {
   background-color: rgb(56, 81, 112);
   cursor: pointer;
 }
+
+#button3{
+    height: 40px;
+    width: 40px;
+}
+
 
 
 

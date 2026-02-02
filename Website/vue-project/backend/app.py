@@ -115,10 +115,10 @@ def fundamentalsearch():
 
     if untereschwelle:
         conditions.append(sql.SQL("messwerte.{column} > %s").format(column=sql.Identifier(parameter)))
-        values.append(int(untereschwelle))
+        values.append(float(untereschwelle))
     if obereschwelle:
         conditions.append(sql.SQL("messwerte.{column} < %s").format(column=sql.Identifier(parameter)))
-        values.append(int(obereschwelle))
+        values.append(float(obereschwelle))
 
         
 
@@ -189,6 +189,8 @@ def expandedsearch():
      #durchschnittliche Werte in einem Zeitraum, pro Station, evtl mit liste am Rand mit top 10 höchsten und niedrigsten durschschnittliche Werte
      #Summe NUR bei Niederschlag sinnvoll
 
+
+#evtl kleiner Film
 
 
 

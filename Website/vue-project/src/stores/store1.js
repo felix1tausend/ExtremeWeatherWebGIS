@@ -44,19 +44,27 @@ export const useStore1 = defineStore('store1', function() {
   }
 
   //Stationen filternund ausgewählte Stationen anzeigen
-  const filteredStations = computed(function() {
-    const q = stationsname.value.toLowerCase()
-    let filtered = []
-    if (q.length >= 2) {
-      filtered = stationsliste.value.filter(function(s) {
-        return s.toLowerCase().includes(q)
+  const filteredStations = computed(function () {
+  const q = stationsname.value.toLowerCase().trim()
+  let filtered = []
+
+  if (q.length >= 2) {
+    const words = q.split(/\s+/)
+
+    filtered = stationsliste.value.filter(function (s) {
+      const name = s.toLowerCase()
+      return words.every(function (word) {
+        return name.includes(word)
       })
-    }
-    ausgewählteStationen.value.forEach(function(s) {
-      if (!filtered.includes(s)) filtered.push(s)
     })
-    return filtered.slice(0, 10)
+  }
+
+  ausgewählteStationen.value.forEach(function (s) {
+    if (!filtered.includes(s)) filtered.push(s)
   })
+
+  return filtered.slice(0, 10)
+})
 
   // Station auswählen/deselektieren
   function toggleStation(station) {
