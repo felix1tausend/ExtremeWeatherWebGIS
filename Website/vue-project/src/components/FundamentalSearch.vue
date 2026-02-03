@@ -71,16 +71,26 @@
     <div id ="unterenavbar">
         <ul>
             <li class = "buttonli"> <button id = "button2" @click="store.fetchResults">Suchen </button></li>
-            <li class = "buttonli"> <button id = "button3"> <b>!!!</b></button> </li>
+            <li class = "buttonli"> <button v-if = "showExtremes === false" id = "button3" @click="showExtremes = true"> <b>!!!</b></button> 
+                                    <button v-else  id = "button3" @click="showExtremes = false"> <b>!!!</b></button></li>
         </ul>   
     </div>
+  </div>
+  <div v-if="showExtremes" class="extrem-panel">
+    <h3>Extremste Messwerte</h3>
+    <ul>
+        <li v-for="item in store.extremwerte" :key="item.id">
+            {{ item.station }} – {{ item.wert }} {{ store.einheit }}
+        </li>
+    </ul>
   </div>
 </template>
 
 <script setup>
-import { onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useStore1 } from '@/stores/store1'
 const store = useStore1()
+const showExtremes = ref(false)
 onMounted(() => {
   store.fetchStationnames()
 })
@@ -184,6 +194,45 @@ li:nth-of-type(1n+10) {
 #button3{
     height: 40px;
     width: 40px;
+    font-weight: 600;
+  border: 2px solid #4b6380;
+}
+
+#button3:hover {
+  background-color: rgb(56, 81, 112);
+}
+
+.extrem-panel {
+  position: fixed;
+  bottom: 43vh;
+  right: 0;
+  width: 168px;
+  height: 280px;
+  margin-right: 8px;
+  padding: 2px;
+  border: 2px groove #4b6380;
+  border-radius: 4px;
+  box-shadow: 0 0 5px rgba(0,0,0,0.3);
+  background: white;
+  z-index: 9000;
+}
+
+
+.close-btn {
+  margin-top: 1em;
+  margin-bottom: 1em;
+  padding: 0.5em 1em;
+  border: 2px solid #4b6380;
+  border-radius: 1px;
+  float: right;
+  background-color: #385170;
+  font-family: 'Ubuntu', system-ui, sans-serif;
+  color: #fff;
+  cursor: pointer;
+}
+
+.close-btn:hover {
+  background-color: #4b6990;
 }
 
 

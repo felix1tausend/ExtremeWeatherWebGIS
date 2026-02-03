@@ -19,7 +19,7 @@ html, body {
 
 
 .leaflet-top.leaflet-right {
-  top: 5vh;
+  top: 4vh;
 }
 
 
@@ -32,10 +32,11 @@ html, body {
 .legend {
   width: 150px;
   background: white;
-  padding: 8px 10px;
+  padding: 4px 10px;
   font-size: 12px;
   line-height: 1.4;
   border-radius: 4px;
+  border: 2px groove #4b6380;
   box-shadow: 0 0 5px rgba(0,0,0,0.3);
   text-align: center;
 }
@@ -43,7 +44,7 @@ html, body {
 .legend-item {
   display: flex;
   align-items: center;
-  padding: 2px;
+  padding: 1px;
 }
 
 .legend-color {
