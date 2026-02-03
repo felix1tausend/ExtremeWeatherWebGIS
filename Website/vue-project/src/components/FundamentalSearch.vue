@@ -40,7 +40,7 @@
         </p>
         <p>Stationen:
             <input class ="eingabe" type="search" placeholder="Nach Station suchen..." v-model="store.stationsname">
-            <ul id = "ul1" v-if="store.filteredStations.length">
+            <ul class = "ul1" v-if="store.filteredStations.length">
                 <li v-for="station in store.filteredStations" :key="station" >
                 <label>
                     <input type="checkbox" 
@@ -70,21 +70,46 @@
     </div>
     <div id ="unterenavbar">
         <ul>
-            <li class = "buttonli"> <button id = "button2" @click="store.fetchResults">Suchen </button></li>
-            <li class = "buttonli"> <button v-if = "showExtremes === false" id = "button3" @click="showExtremes = true"> <b>!!!</b></button> 
-                                    <button v-else  id = "button3" @click="showExtremes = false"> <b>!!!</b></button></li>
+            <li class = "buttonli"> 
+                <button v-if = "showExtremes === false" class = "button2" @click="showExtremes = true"> 
+                    <svg viewBox="0 0 24 24" class="icon" id="icon1">
+                        <path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/>
+                    </svg>
+                </button> 
+                <button v-else  class = "button2" @click="showExtremes = false">
+                    <svg viewBox="0 0 24 24" class="icon" id="icon1">
+                        <path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/>
+                    </svg>
+                </button>
+            </li>
+            <li class = "buttonli"> 
+                <button class = "button2" @click="store.fetchResults">
+                    <svg viewBox="0 0 24 24" class="icon">
+                        <circle cx="11" cy="11" r="7"/>
+                        <line x1="16.65" y1="16.65" x2="22" y2="22"/>
+                    </svg>
+                </button>
+            </li>
         </ul>   
     </div>
   </div>
   <div v-if="showExtremes" class="extrem-panel">
-    <h3>Extremste Messwerte</h3>
-    <ul>
-        <li v-for="item in store.extremwerte" :key="item.id">
-            {{ item.station }} – {{ item.wert }} {{ store.einheit }}
-        </li>
-    </ul>
+    <h3 > Extremwerte
+    </h3>
+    <table id="extremwerteliste">
+        <thead>
+            <tr>
+                <th>Station</th>
+                <th>Wert</th>
+            </tr>
+        </thead>
+        <tr v-for="item in store.extremwerte" :key="item.id">
+           <td> {{ item.stationsname }} </td> <td>{{ item.wert }} {{ store.einheit }}</td>
+        </tr>
+    </table>
   </div>
 </template>
+
 
 <script setup>
 import { ref, onMounted } from 'vue'
@@ -106,9 +131,18 @@ onMounted(() => {
 }
 
 h2{
-   text-align: center; 
-   margin: 5px;
-   padding: 0px;
+    text-align: center; 
+    margin: 5px;
+    padding: 0px;
+}
+
+h3{
+    text-align: center; 
+    width: 100%;
+    margin-top: 3px;
+    margin-bottom: 5px;
+    
+
 }
 
 .eingabe{
@@ -121,15 +155,30 @@ h2{
     color: white;
 }
 
-#ul1 {
-    margin: 5px;
-    margin-left: 20%;
-    display: grid;
-    flex-direction: column;
-    justify-content: left;
+.ul1 {
+     margin: 5px;
+     margin-left: 20%;
+     display: grid;
+     flex-direction: column;
+     justify-content: left;
 }
 
-li:nth-of-type(1n+10) {
+#extremwerteliste{
+  border-collapse: collapse;
+  font-size: 10pt;
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+
+td, th{
+    border: 1px solid rgb(160 160 160);
+    width: 100%;
+    height: 100%;
+    
+}
+
+
+li:nth-of-type(1n+11) {
     display: none;
 } 
 
@@ -168,55 +217,70 @@ li:nth-of-type(1n+10) {
 
 
 #unterenavbar{
-    display: flex;
+    display: grid;
     justify-content: right; 
     margin-right: 5%;
 }
 
 
-#button2{
+.button2{
     height: 40px;
-    width: 100px;
+    width: 40px;
     margin-right: 10px;
+    margin-top: 20px;
     border-radius: 2px;
-    border: 2px groove #304b70;
-    background-color: #142d4c;
+    border: 1px groove #7990b173;
+    background-color: rgba(222, 222, 222, 0.515);
     font-size: large;
     text-align: center;
     color: #d9dbdd;
+    box-shadow: 0 0 5px rgba(0,0,0,0.3);
+    
 }
 
-#button2:hover {
-  background-color: rgb(56, 81, 112);
+.button2:hover {
+  background-color: rgba(189, 189, 189, 0.666);
   cursor: pointer;
 }
 
-#button3{
-    height: 40px;
-    width: 40px;
-    font-weight: 600;
-  border: 2px solid #4b6380;
+.icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-#button3:hover {
-  background-color: rgb(56, 81, 112);
+.icon {
+  width: 22px;
+  height: 22px;
+  fill: lightblue;
+  stroke: #757575;
+  stroke-width: 2;
 }
+
+#icon1{
+    fill: rgb(255, 179, 0);
+    stroke: orange;
+}
+
+
+
 
 .extrem-panel {
   position: fixed;
   bottom: 43vh;
   right: 0;
-  width: 168px;
-  height: 280px;
+  width: 260px;
+  height: fit-content;
   margin-right: 8px;
-  padding: 2px;
+  padding: 5px;
   border: 2px groove #4b6380;
   border-radius: 4px;
   box-shadow: 0 0 5px rgba(0,0,0,0.3);
-  background: white;
+  font-family: 'Ubuntu', system-ui, sans-serif;
+  line-height: 14pt;
+  background: rgb(255, 255, 255);
   z-index: 9000;
 }
-
 
 .close-btn {
   margin-top: 1em;

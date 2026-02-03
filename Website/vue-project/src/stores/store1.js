@@ -13,6 +13,8 @@ export const useStore1 = defineStore('store1', function() {
   const höheunter = ref('')
   const untereschwelle = ref('')
   const obereschwelle = ref('')
+  const marker = ref([]) //Stationsmarker
+  const extremwerte = ref([]) //Extremwertliste
 
 
   const einheit = computed(function() {
@@ -96,14 +98,14 @@ export const useStore1 = defineStore('store1', function() {
     return url.toString() 
   })
 
-  const results = ref([])
 
   // Ergebnis-JSON von Flask holen
-  async function fetchResults() {
-    const response = await fetch(fundamentalurl.value)
-    results.value = await response.json()
-
+async function fetchResults() {
+  const response = await fetch(fundamentalurl.value)
+  const json = await response.json()
+  marker.value = json.daten
+  extremwerte.value = json.extremwerte
 }
 
-  return { parameter, parameterbezeichnung, einheit, messdatum, bundesland, stationsname, stationsliste, ausgewählteStationen, fetchStationnames, filteredStations, toggleStation, höheüber, höheunter, untereschwelle, obereschwelle, fundamentalurl, results, fetchResults}
+  return { parameter, parameterbezeichnung, einheit, messdatum, bundesland, stationsname, stationsliste, ausgewählteStationen, fetchStationnames, filteredStations, toggleStation, höheüber, höheunter, untereschwelle, obereschwelle, fundamentalurl, marker, extremwerte, fetchResults}
 })

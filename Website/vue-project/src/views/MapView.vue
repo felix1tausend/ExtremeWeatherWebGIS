@@ -3,7 +3,7 @@
     <NavBar></NavBar>
     <LayerControl></LayerControl>
     <BasicSearchInterface></BasicSearchInterface>
-    <Map v-if="store.results" :stations="store.results" />
+    <Map v-if="store.marker" :stations="store.marker" />
   </div>
 </template>
 
