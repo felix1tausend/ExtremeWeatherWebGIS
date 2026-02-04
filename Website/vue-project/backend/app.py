@@ -136,6 +136,7 @@ def fundamentalsearch():
     for row in rows2:
         extremwerte.append({
             "stationsname": row[3],
+            "geom": json.loads(row[5]),
             "wert": row[7]
         })
 

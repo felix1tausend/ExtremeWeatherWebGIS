@@ -15,6 +15,7 @@ export const useStore1 = defineStore('store1', function() {
   const obereschwelle = ref('')
   const marker = ref([]) //Stationsmarker
   const extremwerte = ref([]) //Extremwertliste
+  const map = ref(null)
 
 
   const einheit = computed(function() {
@@ -77,6 +78,7 @@ export const useStore1 = defineStore('store1', function() {
       ausgewählteStationen.value.splice(index, 1)
     }
   }
+
 
   //URL aus eingegebenen Daten zusammensetzen
   const fundamentalurl = computed (function(){

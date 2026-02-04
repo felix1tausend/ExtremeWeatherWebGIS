@@ -4,7 +4,7 @@
         <div id="navbar2"> 
             <ul id ="ul2">
                 <li class="li2"><button class="navbar2button" @click="active = 'fundamental'">Einfache Suche</button></li>
-                <li class="li2" id = "list2"><button class="navbar2button">Erweiterte Suche</button></li>
+                <li class="li2" id = "list2"><button class="navbar2button" @click="active = 'expanded'"> Erweiterte Suche </button></li>
                 <li class="li2" id = "list3"><button class="navbar2button">Statistische Analyse</button></li>
             </ul>
         </div>
@@ -16,12 +16,14 @@
              {{ sidebarOpen ? '❮❮' : '❯❯' }}
         </button>
         <FundamentalSearch v-if="active === 'fundamental'" />
+        <ExpandedSearch v-if="active === 'expanded'" />
     </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
 import FundamentalSearch from '@/components/FundamentalSearch.vue'
+import ExpandedSearch from './ExpandedSearch.vue';
 const sidebarOpen = ref(true) 
 const active = ref(null)
 </script>

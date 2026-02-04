@@ -1,7 +1,7 @@
 <template>
   <div class="fundamental-search">
     <h2>Einfache Suche</h2>
-    <div id="Basisparameter" class="bereich">
+    <div class="bereich">
         <h3>Basisfilter</h3>
         <p>Wetterparameter:
             <select v-model="store.parameter" class="eingabe">
@@ -12,13 +12,13 @@
             </select>
         </p>
         <p>Datum:
-            <input id="datumseingabe" class ="eingabe" type="date"  min="1950-01-01" max="2024-12-31" v-model="store.messdatum">
+            <input class ="eingabe" type="date"  min="1950-01-01" max="2024-12-31" v-model="store.messdatum">
         </p>
     </div>
-    <div id="Raumauswahl" class="bereich">
+    <div class="bereich">
         <h3>Räumliche Auswahl (optional) </h3>
         <p>Bundesland:
-            <select id="Bundeslandeingabe" class ="eingabe" v-model="store.bundesland" >
+            <select class ="eingabe" v-model="store.bundesland" >
                 <option>-</option>
                 <option>Baden-Württemberg</option>
                 <option>Bayern</option>
@@ -63,27 +63,27 @@
         <h3>Werteingrenzung (optional)</h3>
         <div><p>Messwertebereich:</p>
             <div class="werteingrenzung">
-                <p class="eingrenzungstext"> über &nbsp; <input class ="eingabe2" v-model="store.untereschwelle"> {{ store.einheit }}</p>
-                <p class="eingrenzungstext">unter <input class ="eingabe2" v-model="store.obereschwelle"> {{ store.einheit }}</p>
+                <p class="eingrenzungstext"> über &nbsp; <input class="eingabe2" v-model="store.untereschwelle"> {{ store.einheit }}</p>
+                <p class="eingrenzungstext">unter <input class="eingabe2" v-model="store.obereschwelle"> {{ store.einheit }}</p>
             </div>
         </div>
     </div>
     <div id ="unterenavbar">
         <ul>
-            <li class = "buttonli"> 
-                <button v-if = "showExtremes === false" class = "button2" @click="showExtremes = true"> 
+            <li> 
+                <button v-if = "showExtremes === false" class="ergebnisbutton" @click="showExtremes = true"> 
                     <svg viewBox="0 0 24 24" class="icon" id="icon1">
                         <path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/>
                     </svg>
                 </button> 
-                <button v-else  class = "button2" @click="showExtremes = false">
+                <button v-else  class="ergebnisbutton" @click="showExtremes = false">
                     <svg viewBox="0 0 24 24" class="icon" id="icon1">
                         <path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/>
                     </svg>
                 </button>
             </li>
-            <li class = "buttonli"> 
-                <button class = "button2" @click="store.fetchResults">
+            <li> 
+                <button class="ergebnisbutton" @click="store.fetchResults">
                     <svg viewBox="0 0 24 24" class="icon">
                         <circle cx="11" cy="11" r="7"/>
                         <line x1="16.65" y1="16.65" x2="22" y2="22"/>
@@ -94,7 +94,7 @@
     </div>
   </div>
   <div v-if="showExtremes" class="extrem-panel">
-    <h3 > Extremwerte
+    <h3 id="h3-1" > Extremwerte
     </h3>
     <table id="extremwerteliste">
         <thead>
@@ -103,7 +103,7 @@
                 <th>Wert</th>
             </tr>
         </thead>
-        <tr v-for="item in store.extremwerte" :key="item.id">
+        <tr v-for="item in store.extremwerte" :key="item.id"">
            <td> {{ item.stationsname }} </td> <td>{{ item.wert }} {{ store.einheit }}</td>
         </tr>
     </table>
@@ -119,6 +119,7 @@ const showExtremes = ref(false)
 onMounted(() => {
   store.fetchStationnames()
 })
+
 </script>
 
 <style scoped>
@@ -129,22 +130,9 @@ onMounted(() => {
     padding: 0.5em;
     font-family: 'Ubuntu', system-ui, sans-serif;
 }
-
-h2{
-    text-align: center; 
-    margin: 5px;
-    padding: 0px;
+.bereich{
+    overflow: auto;
 }
-
-h3{
-    text-align: center; 
-    width: 100%;
-    margin-top: 3px;
-    margin-bottom: 5px;
-    
-
-}
-
 .eingabe{
     float: right;
     padding: 2px;
@@ -154,6 +142,47 @@ h3{
     border-radius: 2px;
     color: white;
 }
+::placeholder {
+    color: rgb(192, 190, 190);
+    opacity: 1;
+}
+.eingabe2{
+    float: center;
+    padding: 2px;
+    margin: 0px;
+    background-color: #142d4cd1;
+    border: 2px solid #142d4c;
+    border-radius: 2px;
+    color: white;
+}
+.eingrenzungstext{
+    margin-bottom: 10px;
+    margin-top: 0px;
+    width: max-content;
+    text-align: left; 
+}
+.werteingrenzung{
+    display: grid;
+    justify-content: right;
+    margin-right: 5%;
+}
+
+
+h2{
+    text-align: center; 
+    margin: 5px;
+    padding: 0px;
+}
+h3{
+    text-align: left; 
+    width: 100%;
+    margin-top: 3px;
+    margin-bottom: 5px;
+}
+#h3-1{
+    text-align: center;
+}
+
 
 .ul1 {
      margin: 5px;
@@ -162,58 +191,9 @@ h3{
      flex-direction: column;
      justify-content: left;
 }
-
-#extremwerteliste{
-  border-collapse: collapse;
-  font-size: 10pt;
-  letter-spacing: 1px;
-  white-space: nowrap;
-}
-
-td, th{
-    border: 1px solid rgb(160 160 160);
-    width: 100%;
-    height: 100%;
-    
-}
-
-
 li:nth-of-type(1n+11) {
     display: none;
 } 
-
-.eingabe2{
-    float: center;
-    padding: 2px;
-    background-color: #142d4cd1;
-    border: 2px solid #142d4c;
-    border-radius: 2px;
-    color: white;
-}
-
-.werteingrenzung{
-    display: grid;
-    justify-content: right;
-    margin-right: 5%;
-
-}
-
-.eingrenzungstext{
-    margin-bottom: 10px;
-    margin-top: 0px;
-    width: max-content;
-    text-align: left;
-    
-}
-
-.bereich{
-    overflow: hidden;
-}
-
-::placeholder {
-    color: rgb(192, 190, 190);
-    opacity: 1;
-}
 
 
 #unterenavbar{
@@ -221,9 +201,7 @@ li:nth-of-type(1n+11) {
     justify-content: right; 
     margin-right: 5%;
 }
-
-
-.button2{
+.ergebnisbutton{
     height: 40px;
     width: 40px;
     margin-right: 10px;
@@ -234,21 +212,17 @@ li:nth-of-type(1n+11) {
     font-size: large;
     text-align: center;
     color: #d9dbdd;
-    box-shadow: 0 0 5px rgba(0,0,0,0.3);
-    
+    box-shadow: 0 0 5px rgba(0,0,0,0.3); 
 }
-
-.button2:hover {
+.ergebnisbutton:hover {
   background-color: rgba(189, 189, 189, 0.666);
   cursor: pointer;
 }
-
 .icon-btn {
   display: flex;
   align-items: center;
   justify-content: center;
 }
-
 .icon {
   width: 22px;
   height: 22px;
@@ -256,13 +230,10 @@ li:nth-of-type(1n+11) {
   stroke: #757575;
   stroke-width: 2;
 }
-
 #icon1{
     fill: rgb(255, 179, 0);
     stroke: orange;
 }
-
-
 
 
 .extrem-panel {
@@ -281,7 +252,17 @@ li:nth-of-type(1n+11) {
   background: rgb(255, 255, 255);
   z-index: 9000;
 }
-
+#extremwerteliste{
+  border-collapse: collapse;
+  font-size: 10pt;
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+td, th{
+    border: 1px solid rgb(160 160 160);
+    width: 100%;
+    height: 100%;
+}
 .close-btn {
   margin-top: 1em;
   margin-bottom: 1em;
@@ -294,12 +275,7 @@ li:nth-of-type(1n+11) {
   color: #fff;
   cursor: pointer;
 }
-
 .close-btn:hover {
   background-color: #4b6990;
 }
-
-
-
-
 </style>
