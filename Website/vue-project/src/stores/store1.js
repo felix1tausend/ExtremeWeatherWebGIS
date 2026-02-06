@@ -1,10 +1,14 @@
 // stores/store1.js
 import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 
 export const useStore1 = defineStore('store1', function() {
   const parameter = ref('txk')
   const messdatum = ref('2024-12-31')
+  const von_datum = ref('2023-12-31')
+  const bis_datum = ref('2024-12-31')
+  const methode = ref('txk_max')
+  const listensortierung = ref('desc')
   const bundesland = ref('')
   const stationsname = ref('')         // Eingabe im Suchfeld
   const stationsliste = ref([])        // Alle Stationen aus Datei
@@ -15,28 +19,52 @@ export const useStore1 = defineStore('store1', function() {
   const obereschwelle = ref('')
   const marker = ref([]) //Stationsmarker
   const extremwerte = ref([]) //Extremwertliste
-  const map = ref(null)
+  const suchmodus = ref('fundamental')
 
+  watch(suchmodus, (neu) => {
+    if (neu === 'fundamental') {
+      methode.value = 'txk_max'
+      von_datum.value = '2023-12-31'
+      bis_datum.value = '2024-12-31'
+      listensortierung.value = 'desc'
+    }
+
+    if (neu === 'expanded') {
+      messdatum.value = '2024-12-31'
+    }
+  })
 
   const einheit = computed(function() {
-    switch (parameter.value) {
-      case 'txk':
-      case 'tnk': return '°C'
-      case 'fx': return 'm/s'
-      case 'rsk': return 'mm'
-      default: return ''
-    }
-  })
+      let param
+      if (suchmodus.value === 'expanded') {
+        param = methode.value.split('_')[0]
+      } else {
+        param = parameter.value
+      }
+      switch (param) {
+        case 'txk':
+        case 'tnk': return '°C'
+        case 'fx': return 'm/s'
+        case 'rsk': return 'mm'
+        default: return ''
+      }
+    })
 
   const parameterbezeichnung = computed(function(){
-    switch (parameter.value) {
-      case 'txk': return 'Tagesmaximaltemperatur'
-      case 'tnk': return 'Tagenminimaltemperatur'
-      case 'fx': return 'Tagesmaximalwindgeschwindigkeit'
-      case 'rsk': return 'Tagesniederschlagssumme'
-      default: return ''
-    }
-  })
+      let param
+      if (suchmodus.value === 'expanded') {
+        param = methode.value.split('_')[0]
+      } else {
+        param = parameter.value
+      }
+      switch (param) {
+        case 'txk': return 'Tagesmaximaltemperatur'
+        case 'tnk': return 'Tagesminimaltemperatur'
+        case 'fx': return 'Tagesmaximalwindgeschwindigkeit'
+        case 'rsk': return 'Tagesniederschlagssumme'
+        default: return ''
+      }
+    })
 
 
   // Stationen aus Datei laden und in Liste packen
@@ -46,7 +74,7 @@ export const useStore1 = defineStore('store1', function() {
     stationsliste.value = text.split('\n')
   }
 
-  //Stationen filternund ausgewählte Stationen anzeigen
+  //Stationen filtern und ausgewählte Stationen anzeigen
   const filteredStations = computed(function () {
   const q = stationsname.value.toLowerCase().trim()
   let filtered = []
@@ -81,10 +109,8 @@ export const useStore1 = defineStore('store1', function() {
 
 
   //URL aus eingegebenen Daten zusammensetzen
-  const fundamentalurl = computed (function(){
-    const url = new URL('http://localhost:5000/api/fundamentalsearch/')
-    url.searchParams.set('parameter', parameter.value)
-    url.searchParams.set('messdatum', messdatum.value)
+  //Gemeinsame Grundwerte
+  const gemeinsameParameter = function(url){
     if (bundesland.value && bundesland.value != '-')
       url.searchParams.set('bundesland', bundesland.value)
     if (ausgewählteStationen.value.length > 0)
@@ -97,17 +123,47 @@ export const useStore1 = defineStore('store1', function() {
       url.searchParams.set('untereschwelle', untereschwelle.value)
     if (obereschwelle.value)
       url.searchParams.set('obereschwelle', obereschwelle.value)
-    return url.toString() 
-  })
+  }
+
+// Einfache Suche
+const fundamentalurl = computed(() => {
+  if (suchmodus.value !== 'fundamental') return '';
+  const url = new URL('http://localhost:5000/api/fundamentalsearch/')
+  url.searchParams.set('parameter', parameter.value)
+  url.searchParams.set('messdatum', messdatum.value)
+  gemeinsameParameter(url)
+  return url.toString()
+})
+
+// Erweiterte Suche
+const expandedurl = computed(() => {
+  if (suchmodus.value !== 'expanded') return '';
+  const url = new URL('http://localhost:5000/api/expandedsearch/')
+  const [param, aggregation] = methode.value.split('_')
+  url.searchParams.set('parameter', param)
+  url.searchParams.set('aggregation', aggregation)
+  url.searchParams.set('von_datum', von_datum.value)
+  url.searchParams.set('bis_datum', bis_datum.value)
+  if (aggregation === 'sum')
+     url.searchParams.set('listensortierung', listensortierung.value)
+  gemeinsameParameter(url)
+  return url.toString()
+})
 
 
   // Ergebnis-JSON von Flask holen
 async function fetchResults() {
-  const response = await fetch(fundamentalurl.value)
-  const json = await response.json()
-  marker.value = json.daten
-  extremwerte.value = json.extremwerte
-}
+  if (suchmodus.value === "fundamental"){
+    const response = await fetch(fundamentalurl.value)
+    const json = await response.json()
+    marker.value = json.daten
+    extremwerte.value = json.extremwerte
+  }if (suchmodus.value === "expanded"){
+    const response = await fetch(expandedurl.value)
+    const json = await response.json()
+    marker.value = json.daten
+    extremwerte.value = json.extremwerte
+}}
 
-  return { parameter, parameterbezeichnung, einheit, messdatum, bundesland, stationsname, stationsliste, ausgewählteStationen, fetchStationnames, filteredStations, toggleStation, höheüber, höheunter, untereschwelle, obereschwelle, fundamentalurl, marker, extremwerte, fetchResults}
+  return { parameter, parameterbezeichnung, einheit, messdatum, von_datum, bis_datum, methode,listensortierung, bundesland, stationsname, stationsliste, ausgewählteStationen, fetchStationnames, filteredStations, toggleStation, höheüber, höheunter, untereschwelle, obereschwelle, fundamentalurl, expandedurl, marker, extremwerte, fetchResults, suchmodus}
 })

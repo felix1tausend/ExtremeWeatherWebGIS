@@ -12,8 +12,7 @@ def db_connection():
     parser = ConfigParser()
     parser.read('database.ini', encoding="utf-8")
     db = parser['postgresql']  
-    
-    
+
     conn = psycopg2.connect(
         host=db['host'],
         database=db['database'],
@@ -23,14 +22,9 @@ def db_connection():
     )
     return conn
 
-
-@app.route("/api/fundamentalsearch/", methods=['GET'])
-def fundamentalsearch():
-    #Darstellung eines Parameters und festgelegten Tages für die einfache Suchabfrage
-    #Ergebnis ist Kartenausschnitt mit Stationen und ihren Werten an einem bestimmten festgelegten Tag
-    #Basisparameter
-    parameter = request.args.get("parameter")
-    messdatum = request.args.get("messdatum")
+def gemeinsameAbfrage(parameter):
+    conditions = []
+    values = []
     #räumliche Auswahl
     bundesland = request.args.get("bundesland") #optional
     stationsnamen_raw = request.args.get("stationsnamen") #optional
@@ -39,14 +33,7 @@ def fundamentalsearch():
     #Werteingrenzung
     untereschwelle = request.args.get("untereschwelle")#optional #Messwert soll größergleich einem angegebenen Schwellwert sein
     obereschwelle = request.args.get("obereschwelle")#optional #Messwert soll kleinergleich einem angegebenen Schwellwert sein
-    #Liste mit top 10 höchsten und niedrigsten Werten
-
-    conn = db_connection()
-    cur = conn.cursor()
-    conditions = []
-    values = [messdatum, messdatum]
-
-    stationsnamen = None
+    stationsnamen =  None
     if stationsnamen_raw:
         stationsnamen = stationsnamen_raw.split(",")  
     if bundesland and not stationsnamen:
@@ -65,11 +52,26 @@ def fundamentalsearch():
         conditions.append(sql.SQL("stationen.stationshoehe < %s"))
         values.append(int(höheunter))
     if untereschwelle:
-        conditions.append(sql.SQL("messwerte.{column} > %s").format(column=sql.Identifier(parameter)))
+        conditions.append(sql.SQL("messwerte.{col} >= %s").format(col=sql.Identifier(parameter)))
         values.append(float(untereschwelle))
     if obereschwelle:
-        conditions.append(sql.SQL("messwerte.{column} < %s").format(column=sql.Identifier(parameter)))
+        conditions.append(sql.SQL("messwerte.{col} <= %s").format(col=sql.Identifier(parameter)))
         values.append(float(obereschwelle))
+    return conditions, values
+
+
+@app.route("/api/fundamentalsearch/", methods=['GET'])
+def fundamentalsearch():
+    #Darstellung eines Parameters und festgelegten Tages für die einfache Suchabfrage
+    #Ergebnis ist Kartenausschnitt mit Stationen und ihren Werten an einem bestimmten festgelegten Tag
+    #Basisparameter
+    parameter = request.args.get("parameter")
+    messdatum = request.args.get("messdatum")
+    
+    conditions, values = gemeinsameAbfrage(parameter)
+    values = [messdatum, messdatum] + values
+    conn = db_connection()
+    cur = conn.cursor()
 
     query = sql.SQL("""
         SELECT
@@ -88,8 +90,7 @@ def fundamentalsearch():
         WHERE {conditions}
     """).format(
         column=sql.Identifier(parameter),
-        conditions=sql.SQL(" AND ").join(conditions) if conditions else sql.SQL("TRUE")
-    )
+        conditions=sql.SQL(" AND ").join(conditions) if conditions else sql.SQL("TRUE"))
     cur.execute(query, values)
     rows = cur.fetchall()
 
@@ -97,7 +98,6 @@ def fundamentalsearch():
         conditions.append(sql.SQL("messwerte.{column} != -999 ORDER BY messwerte.{column} ASC LIMIT 10 ").format(column=sql.Identifier(parameter)))
     else:
         conditions.append(sql.SQL("messwerte.{column} != -999 ORDER BY messwerte.{column} DESC LIMIT 10 ").format(column=sql.Identifier(parameter)))
-        
     query = sql.SQL("""
         SELECT
             stationen.von_datum,
@@ -115,8 +115,7 @@ def fundamentalsearch():
         WHERE {conditions}
     """).format(
         column=sql.Identifier(parameter),
-        conditions=sql.SQL(" AND ").join(conditions) if conditions else sql.SQL("TRUE")
-    )
+        conditions=sql.SQL(" AND ").join(conditions) if conditions else sql.SQL("TRUE"))
     cur.execute(query, values)
     rows2 = cur.fetchall()
     cur.close()
@@ -126,6 +125,8 @@ def fundamentalsearch():
     extremwerte = []
     for row in rows:
         data.append({
+            "von_datum": row[0],
+            "bis_datum": row[1],
             "stationshoehe": row[2],
             "stationsname": row[3],
             "bundesland": row[4],
@@ -135,18 +136,21 @@ def fundamentalsearch():
         })
     for row in rows2:
         extremwerte.append({
+            "von_datum": row[0],
+            "bis_datum": row[1],
             "stationsname": row[3],
             "geom": json.loads(row[5]),
             "wert": row[7]
         })
-
     return jsonify({
         "daten": data,
         "extremwerte": extremwerte
     })
 
 
-@app.route("/api/expandedsearch", methods=['GET'])
+
+
+@app.route("/api/expandedsearch/", methods=['GET'])
 def expandedsearch():
     #Darstellung eines Parameters und festgelegten Zeitraumes für die erweiterte Suchabfrage, 
     #Ergebnis ist 
@@ -156,18 +160,157 @@ def expandedsearch():
     parameter = request.args.get("parameter")
     von_datum = request.args.get("von_datum")
     bis_datum = request.args.get("bis_datum")
-    #räumliche Auswahl
-    bundesland = request.args.get("bundesland") #optional
-    stationsname = request.args.get("stationsname") #optional
-    höheüber = request.args.get("höheüber") #optional
-    höheunter = request.args.get("höheunter") #optional
     #Aggregatfunktionen
-    aggregation = request.args.get("aggregation") # erlaubt: max | min | avg | sum
-     #maximale Werte in einem Zeitraum, mit angabe des Messdatums, pro Station, evtl mit liste pro Station
-     #minimale Werte in einem Zeitraum, mit angabe des Messdatums, pro Station, evtl mit liste pro Station
-     #durchschnittliche Werte in einem Zeitraum, pro Station, evtl mit liste am Rand mit top 10 höchsten und niedrigsten durschschnittliche Werte
+    aggregation = request.args.get("aggregation") # erlaubt: max | min | sum
+     #maximale Werte in einem Zeitraum, mit angabe des Messdatums, pro Station
+     #minimale Werte in einem Zeitraum, mit angabe des Messdatums, pro Station
      #Summe NUR bei Niederschlag sinnvoll
-#evtl kleiner Film
+    listensortierung = request.args.get("listensortierung") #falls sum für Niederschlag gesetzt, kann zwischen den trockensten und nassesten Stationenen in der Extremwertliste unterschieden werden
+
+    conditions, values = gemeinsameAbfrage(parameter)
+    values = [von_datum, bis_datum] + values
+    conn = db_connection()
+    cur = conn.cursor()
+
+    if aggregation != "sum":
+        if parameter == "tnk" :
+            sortierung = sql.SQL("ASC")
+        else:
+            sortierung = sql.SQL("DESC")
+
+        # Abfrage für Minimal- oder Maximalwerte
+        query = sql.SQL("""
+            SELECT DISTINCT ON (stationen.stations_id)
+                stationen.von_datum,
+                stationen.bis_datum,
+                stationen.stationshoehe,
+                stationen.stationsname,
+                stationen.bundesland,
+                ST_AsGeoJSON(stationen.geom) AS geom,
+                COALESCE(messwerte.mess_datum, DATE '1900-01-01') AS mess_datum,
+                COALESCE(messwerte.{column}, -999) AS wert
+            FROM stationen
+            LEFT JOIN messwerte
+            ON stationen.stations_id = messwerte.stations_id
+            AND messwerte.mess_datum BETWEEN %s AND %s
+            WHERE {conditions}
+            ORDER BY stationen.stations_id, messwerte.{column} {sortierung};
+        """).format(
+            column=sql.Identifier(parameter),
+            conditions=sql.SQL(" AND ").join(conditions) if conditions else sql.SQL("TRUE"),
+            sortierung = sortierung)
+        cur.execute(query, values)
+        rows = cur.fetchall()
+        query = sql.SQL("""
+            SELECT *
+            FROM (
+                SELECT DISTINCT ON (stationen.stations_id)
+                    stationen.von_datum,
+                    stationen.bis_datum,
+                    stationen.stationshoehe,
+                    stationen.stationsname,
+                    stationen.bundesland,
+                    ST_AsGeoJSON(stationen.geom) AS geom,
+                    COALESCE(messwerte.mess_datum, DATE '1900-01-01') AS mess_datum,
+                    COALESCE(messwerte.{column}, -999) AS wert
+                FROM stationen
+                LEFT JOIN messwerte
+                ON stationen.stations_id = messwerte.stations_id
+                AND messwerte.mess_datum BETWEEN %s AND %s
+                WHERE {conditions}
+                ORDER BY stationen.stations_id, messwerte.{column} {sortierung}
+            ) AS sub
+            WHERE wert != -999
+            ORDER BY wert {sortierung} LIMIT 10
+        """).format(
+            column=sql.Identifier(parameter),
+            conditions=sql.SQL(" AND ").join(conditions) if conditions else sql.SQL("TRUE"),
+            sortierung = sortierung)
+        cur.execute(query, values)
+        rows2 = cur.fetchall()
+    else:
+         # Abfrage für Summe des Niederschlages
+        query = sql.SQL("""
+            SELECT
+                stationen.von_datum,
+                stationen.bis_datum,
+                stationen.stationshoehe,
+                stationen.stationsname,
+                stationen.bundesland,
+                ST_AsGeoJSON(stationen.geom) AS geom,
+                MAX(COALESCE(messwerte.mess_datum, DATE '1900-01-01')) AS mess_datum,
+                SUM(COALESCE(messwerte.{column}, -999)) AS wert
+            FROM stationen
+            LEFT JOIN messwerte
+            ON stationen.stations_id = messwerte.stations_id
+            AND messwerte.mess_datum BETWEEN %s AND %s
+            WHERE {conditions}
+            AND messwerte.{column} != -999
+            GROUP BY stationen.stations_id
+        """).format(
+            column=sql.Identifier(parameter),
+            conditions=sql.SQL(" AND ").join(conditions) if conditions else sql.SQL("TRUE"))
+        cur.execute(query, values)
+        rows = cur.fetchall()
+
+        if listensortierung == "desc":
+            listsort = sql.SQL("DESC")
+        if listensortierung == "asc":
+             listsort = sql.SQL("ASC")
+        query = sql.SQL("""
+            SELECT
+                stationen.von_datum,
+                stationen.bis_datum,
+                stationen.stationshoehe,
+                stationen.stationsname,
+                stationen.bundesland,
+                ST_AsGeoJSON(stationen.geom) AS geom,
+                MAX(COALESCE(messwerte.mess_datum, DATE '1900-01-01')) AS mess_datum,
+                SUM(COALESCE(messwerte.{column}, -999)) AS wert
+            FROM stationen
+            LEFT JOIN messwerte
+            ON stationen.stations_id = messwerte.stations_id
+            AND messwerte.mess_datum BETWEEN %s AND %s
+            WHERE {conditions}
+            AND messwerte.{column} != -999
+            GROUP BY stationen.stations_id
+            ORDER BY wert {listensortierung} LIMIT 10
+        """).format(
+            column=sql.Identifier(parameter),
+            conditions=sql.SQL(" AND ").join(conditions) if conditions else sql.SQL("TRUE"),
+            listensortierung = listsort)
+        cur.execute(query, values)
+        rows2 = cur.fetchall()
+    cur.close()
+    conn.close()
+
+    data = []
+    extremwerte = []
+    for row in rows:
+        data.append({
+            "von_datum": row[0],
+            "bis_datum": row[1],
+            "stationshoehe": row[2],
+            "stationsname": row[3],
+            "bundesland": row[4],
+            "geom": json.loads(row[5]),
+            "mess_datum": row[6],
+            "wert": row[7]
+        })
+    for row in rows2:
+        extremwerte.append({
+            "von_datum": row[0],
+            "bis_datum": row[1],
+            "stationsname": row[3],
+            "geom": json.loads(row[5]),
+            "wert": row[7]
+        })
+    return jsonify({
+        "daten": data,
+        "extremwerte": extremwerte
+    })
+
+
 
 @app.route("/api/statisticalanalysis", methods=['GET'])
 def statisticalanalysis():

@@ -214,10 +214,18 @@ function getColorByValue(wert, einheit) {
 
   function ladeStationenmitWert(station){
     const coords = station.geom
+    
+      const datum = new Date(station.mess_datum);
+      const formattedDatum = new Intl.DateTimeFormat('de-DE', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      }).format(datum);
 
     if  (station.wert != -999){
       let popupText = "<b>"+ station.stationsname + "</b><br>"
                 + store.parameterbezeichnung + ": " + "<b>" + station.wert + " " + store.einheit + "</b>" + "<br>"
+                + "Messdatum " + ": " +  formattedDatum + "<br>"
                 + "Stationshöhe: " + station.stationshoehe + " m" + "<br>"
                 + "Standort: " + coords.coordinates[1] + " N" + " " + coords.coordinates[0] + " O"
       

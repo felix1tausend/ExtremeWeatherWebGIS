@@ -3,32 +3,34 @@
     <h2>Erweiterte Suche</h2>
     <div class="bereich">
         <h3>Basisfilter</h3>
-        <p>Wetterparameter:
-            <select v-model="store.parameter" class="eingabe">
-            <option value="txk">Tagesmaximaltemperatur</option>
-            <option value="tnk">Tagesminimaltemperatur</option>
-            <option value="fx">Tagesmaximalwindgeschwindigkeit</option>
-            <option value="rsk">Tagesniederschlag</option>
+        <p>Auswertungsmethode:
+            <select v-model="store.methode" class="eingabe">
+            <option value="txk_max">Höchste Temperatur</option>
+            <option value="tnk_min">Niedrigste Temperatur</option>
+            <option value="fx_max">Höchste Windgeschwindigkeit</option>
+            <option value="rsk_max">Höchster Tagesniederschlag</option>
+            <option value="rsk_sum">Niederschlagssumme</option>
             </select>
         </p>
+        <div v-if="store.methode === 'rsk_sum'" class="extrem-toggle">
+            <p>In Extremwertliste anzeigen:</p>
+            <label class="label1">
+                <input type="radio" value="desc" name="listensortierung" v-model="store.listensortierung">
+                Nasseste Stationen
+            </label>
+            <br>
+            <label class="label1">
+                <input type="radio" value="asc" name="listensortierung" v-model="store.listensortierung">
+                Trockenste Stationen
+            </label>
+        </div>
+        <br>
         <div>Zeitraum:
             <div class="bereich2">
-            <p ><input class="eingabe2" type="date" min="1950-01-01" max="2024-12-31" v-model="store.messdatum"> bis
-            <input class="eingabe2" type="date" min="1950-01-01" max="2024-12-31" v-model="store.messdatum"></p>
+            <p ><input class="eingabe2" type="date" min="1950-01-01" max="2024-12-31" v-model="store.von_datum"> bis
+            <input class="eingabe2" type="date" min="1950-01-01" max="2024-12-31" v-model="store.bis_datum"></p>
             </div>
         </div>
-    </div>
-    <div class="bereich">
-        <h3>Aggregatfunktion</h3>
-        <p>Methode
-            <select class ="eingabe" v-model="store.bundesland" >
-                <option>-</option>
-                <option>Maximum</option>
-                <option>Minimum</option>
-                <option>Durchschnitt</option>
-                <option>Summe</option>
-            </select>
-        </p>
     </div>
     <div class="bereich">
         <h3>Räumliche Auswahl (optional) </h3>
@@ -161,6 +163,9 @@ onMounted(() => {
     border-radius: 2px;
     color: white;
 }
+.label1{
+    margin-left: 30%;
+}
 ::placeholder {
     color: rgb(192, 190, 190);
     opacity: 1;
@@ -260,7 +265,7 @@ li:nth-of-type(1n+11) {
   position: fixed;
   bottom: 43vh;
   right: 0;
-  width: 260px;
+  width: fit-content;
   height: fit-content;
   margin-right: 8px;
   padding: 5px;
@@ -273,14 +278,15 @@ li:nth-of-type(1n+11) {
   z-index: 9000;
 }
 #extremwerteliste{
+
   border-collapse: collapse;
-  font-size: 10pt;
+  font-size: 9pt;
   letter-spacing: 1px;
   white-space: nowrap;
 }
 td, th{
     border: 1px solid rgb(160 160 160);
-    width: 100%;
+    width: fit-content;
     height: 100%;
 }
 .close-btn {
