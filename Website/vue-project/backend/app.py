@@ -22,7 +22,7 @@ def db_connection():
     )
     return conn
 
-def gemeinsameAbfrage(parameter):
+def gemeinsameAbfrage(parameter, aggregation = 'None'):
     conditions = []
     values = []
     #räumliche Auswahl
@@ -34,6 +34,7 @@ def gemeinsameAbfrage(parameter):
     untereschwelle = request.args.get("untereschwelle")#optional #Messwert soll größergleich einem angegebenen Schwellwert sein
     obereschwelle = request.args.get("obereschwelle")#optional #Messwert soll kleinergleich einem angegebenen Schwellwert sein
     stationsnamen =  None
+
     if stationsnamen_raw:
         stationsnamen = stationsnamen_raw.split(",")  
     if bundesland and not stationsnamen:
@@ -51,10 +52,10 @@ def gemeinsameAbfrage(parameter):
     if höheunter:
         conditions.append(sql.SQL("stationen.stationshoehe < %s"))
         values.append(int(höheunter))
-    if untereschwelle:
+    if untereschwelle and aggregation != 'sum':
         conditions.append(sql.SQL("messwerte.{col} >= %s").format(col=sql.Identifier(parameter)))
         values.append(float(untereschwelle))
-    if obereschwelle:
+    if obereschwelle and aggregation != 'sum':
         conditions.append(sql.SQL("messwerte.{col} <= %s").format(col=sql.Identifier(parameter)))
         values.append(float(obereschwelle))
     return conditions, values
@@ -165,9 +166,11 @@ def expandedsearch():
      #maximale Werte in einem Zeitraum, mit angabe des Messdatums, pro Station
      #minimale Werte in einem Zeitraum, mit angabe des Messdatums, pro Station
      #Summe NUR bei Niederschlag sinnvoll
+    untereschwelle = request.args.get("untereschwelle")#optional #Messwert soll größergleich einem angegebenen Schwellwert sein
+    obereschwelle = request.args.get("obereschwelle")#optional #Messwert soll kleinergleich einem angegebenen Schwellwert sein
     listensortierung = request.args.get("listensortierung") #falls sum für Niederschlag gesetzt, kann zwischen den trockensten und nassesten Stationenen in der Extremwertliste unterschieden werden
 
-    conditions, values = gemeinsameAbfrage(parameter)
+    conditions, values = gemeinsameAbfrage(parameter, aggregation)
     values = [von_datum, bis_datum] + values
     conn = db_connection()
     cur = conn.cursor()
@@ -221,7 +224,7 @@ def expandedsearch():
                 ORDER BY stationen.stations_id, messwerte.{column} {sortierung}
             ) AS sub
             WHERE wert != -999
-            ORDER BY wert {sortierung} LIMIT 10
+            ORDER BY wert {sortierung} LIMIT 10;
         """).format(
             column=sql.Identifier(parameter),
             conditions=sql.SQL(" AND ").join(conditions) if conditions else sql.SQL("TRUE"),
@@ -229,7 +232,20 @@ def expandedsearch():
         cur.execute(query, values)
         rows2 = cur.fetchall()
     else:
+        values = values + [bis_datum, von_datum]
+        if untereschwelle:
+            werteingrenzung = sql.SQL(">= %s")
+            values = values + [untereschwelle]
+        if obereschwelle:
+            werteingrenzung = sql.SQL("<= %s")
+            values = values + [obereschwelle]
+        if obereschwelle and untereschwelle:
+            werteingrenzung = sql.SQL("<= %s AND >= %s")
+            values = values + [obereschwelle, untereschwelle]
+        else: werteingrenzung = sql.SQL(">= 0")
          # Abfrage für Summe des Niederschlages
+
+
         query = sql.SQL("""
             SELECT
                 stationen.von_datum,
@@ -238,18 +254,20 @@ def expandedsearch():
                 stationen.stationsname,
                 stationen.bundesland,
                 ST_AsGeoJSON(stationen.geom) AS geom,
-                MAX(COALESCE(messwerte.mess_datum, DATE '1900-01-01')) AS mess_datum,
-                SUM(COALESCE(messwerte.{column}, -999)) AS wert
+                MAX(messwerte.mess_datum) AS mess_datum,
+                ROUND (SUM(messwerte.{column})::numeric,2) AS wert
             FROM stationen
-            LEFT JOIN messwerte
+            JOIN messwerte
             ON stationen.stations_id = messwerte.stations_id
             AND messwerte.mess_datum BETWEEN %s AND %s
             WHERE {conditions}
             AND messwerte.{column} != -999
             GROUP BY stationen.stations_id
+            HAVING COUNT(messwerte.mess_datum) = (DATE %s - DATE %s + 1) AND SUM(messwerte.{column}) {werteingrenzung};
         """).format(
             column=sql.Identifier(parameter),
-            conditions=sql.SQL(" AND ").join(conditions) if conditions else sql.SQL("TRUE"))
+            conditions=sql.SQL(" AND ").join(conditions) if conditions else sql.SQL("TRUE"),
+            werteingrenzung = werteingrenzung)
         cur.execute(query, values)
         rows = cur.fetchall()
 
@@ -265,19 +283,21 @@ def expandedsearch():
                 stationen.stationsname,
                 stationen.bundesland,
                 ST_AsGeoJSON(stationen.geom) AS geom,
-                MAX(COALESCE(messwerte.mess_datum, DATE '1900-01-01')) AS mess_datum,
-                SUM(COALESCE(messwerte.{column}, -999)) AS wert
+                MAX(messwerte.mess_datum) AS mess_datum,
+                ROUND (SUM(messwerte.{column})::numeric,2) AS wert
             FROM stationen
-            LEFT JOIN messwerte
+            JOIN messwerte
             ON stationen.stations_id = messwerte.stations_id
             AND messwerte.mess_datum BETWEEN %s AND %s
             WHERE {conditions}
             AND messwerte.{column} != -999
             GROUP BY stationen.stations_id
-            ORDER BY wert {listensortierung} LIMIT 10
+            HAVING COUNT(messwerte.mess_datum) = (DATE %s - DATE %s + 1) AND SUM(messwerte.{column}) {werteingrenzung}
+            ORDER BY wert {listensortierung} LIMIT 10;
         """).format(
             column=sql.Identifier(parameter),
             conditions=sql.SQL(" AND ").join(conditions) if conditions else sql.SQL("TRUE"),
+            werteingrenzung = werteingrenzung,
             listensortierung = listsort)
         cur.execute(query, values)
         rows2 = cur.fetchall()
