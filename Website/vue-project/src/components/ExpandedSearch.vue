@@ -12,6 +12,12 @@
             <option value="rsk_sum">Niederschlagssumme</option>
             </select>
         </p>
+        <div>Zeitraum:
+            <div class="bereich2">
+            <p ><input class="eingabe2" type="date" min="1950-01-01" max="2024-12-31" v-model="store.von_datum"> bis
+            <input class="eingabe2" type="date" min="1950-01-01" max="2024-12-31" v-model="store.bis_datum"></p>
+            </div>
+        </div>
         <div v-if="store.methode === 'rsk_sum'" class="extrem-toggle">
             <p>In Extremwertliste anzeigen:</p>
             <label class="label1">
@@ -23,13 +29,6 @@
                 <input type="radio" value="asc" name="listensortierung" v-model="store.listensortierung">
                 Trockenste Stationen
             </label>
-        </div>
-        <br>
-        <div>Zeitraum:
-            <div class="bereich2">
-            <p ><input class="eingabe2" type="date" min="1950-01-01" max="2024-12-31" v-model="store.von_datum"> bis
-            <input class="eingabe2" type="date" min="1950-01-01" max="2024-12-31" v-model="store.bis_datum"></p>
-            </div>
         </div>
     </div>
     <div class="bereich">
@@ -206,6 +205,10 @@ h3{
 }
 #h3-1{
     text-align: center;
+}
+p{
+    margin-top: 0;
+    padding-top: 2px;
 }
 
 

@@ -22,7 +22,7 @@ def db_connection():
     )
     return conn
 
-def gemeinsameAbfrage(parameter, aggregation = 'None'):
+def gemeinsameAbfrage(parameter):
     conditions = []
     values = []
     #räumliche Auswahl
@@ -30,9 +30,7 @@ def gemeinsameAbfrage(parameter, aggregation = 'None'):
     stationsnamen_raw = request.args.get("stationsnamen") #optional
     höheüber = request.args.get("höheüber") #optional
     höheunter = request.args.get("höheunter") #optional
-    #Werteingrenzung
-    untereschwelle = request.args.get("untereschwelle")#optional #Messwert soll größergleich einem angegebenen Schwellwert sein
-    obereschwelle = request.args.get("obereschwelle")#optional #Messwert soll kleinergleich einem angegebenen Schwellwert sein
+    
     stationsnamen =  None
 
     if stationsnamen_raw:
@@ -52,12 +50,6 @@ def gemeinsameAbfrage(parameter, aggregation = 'None'):
     if höheunter:
         conditions.append(sql.SQL("stationen.stationshoehe < %s"))
         values.append(int(höheunter))
-    if untereschwelle and aggregation != 'sum':
-        conditions.append(sql.SQL("messwerte.{col} >= %s").format(col=sql.Identifier(parameter)))
-        values.append(float(untereschwelle))
-    if obereschwelle and aggregation != 'sum':
-        conditions.append(sql.SQL("messwerte.{col} <= %s").format(col=sql.Identifier(parameter)))
-        values.append(float(obereschwelle))
     return conditions, values
 
 
@@ -68,8 +60,17 @@ def fundamentalsearch():
     #Basisparameter
     parameter = request.args.get("parameter")
     messdatum = request.args.get("messdatum")
+    #Werteingrenzung
+    untereschwelle = request.args.get("untereschwelle")#optional #Messwert soll größergleich einem angegebenen Schwellwert sein
+    obereschwelle = request.args.get("obereschwelle")#optional #Messwert soll kleinergleich einem angegebenen Schwellwert sein
     
     conditions, values = gemeinsameAbfrage(parameter)
+    if untereschwelle:
+        conditions.append(sql.SQL("messwerte.{col} >= %s").format(col=sql.Identifier(parameter)))
+        values.append(float(untereschwelle))
+    if obereschwelle:
+        conditions.append(sql.SQL("messwerte.{col} <= %s").format(col=sql.Identifier(parameter)))
+        values.append(float(obereschwelle))
     values = [messdatum, messdatum] + values
     conn = db_connection()
     cur = conn.cursor()
@@ -153,6 +154,8 @@ def fundamentalsearch():
 
 @app.route("/api/expandedsearch/", methods=['GET'])
 def expandedsearch():
+    rows = []
+    rows2 = []
     #Darstellung eines Parameters und festgelegten Zeitraumes für die erweiterte Suchabfrage, 
     #Ergebnis ist 
     #1) Kartenausschnitt mit einzelnen Stationen und ihren extremsten Werten/ Durchschnittlichen Messwerten in dem Zeitraum mit Angabe des Datums
@@ -169,20 +172,23 @@ def expandedsearch():
     untereschwelle = request.args.get("untereschwelle")#optional #Messwert soll größergleich einem angegebenen Schwellwert sein
     obereschwelle = request.args.get("obereschwelle")#optional #Messwert soll kleinergleich einem angegebenen Schwellwert sein
     listensortierung = request.args.get("listensortierung") #falls sum für Niederschlag gesetzt, kann zwischen den trockensten und nassesten Stationenen in der Extremwertliste unterschieden werden
-
-    conditions, values = gemeinsameAbfrage(parameter, aggregation)
-    values = [von_datum, bis_datum] + values
+    #Werteingrenzung
+    untereschwelle = request.args.get("untereschwelle")#optional #Messwert soll größergleich einem angegebenen Schwellwert sein
+    obereschwelle = request.args.get("obereschwelle")#optional #Messwert soll kleinergleich einem angegebenen Schwellwert sein
+    
+    conditions, values = gemeinsameAbfrage(parameter)
     conn = db_connection()
     cur = conn.cursor()
 
     if aggregation != "sum":
-        if parameter == "tnk" :
+        values_inner = [von_datum, bis_datum] + values
+        if parameter == "tnk":
             sortierung = sql.SQL("ASC")
         else:
             sortierung = sql.SQL("DESC")
 
         # Abfrage für Minimal- oder Maximalwerte
-        query = sql.SQL("""
+        inner_query = sql.SQL("""
             SELECT DISTINCT ON (stationen.stations_id)
                 stationen.von_datum,
                 stationen.bis_datum,
@@ -190,60 +196,73 @@ def expandedsearch():
                 stationen.stationsname,
                 stationen.bundesland,
                 ST_AsGeoJSON(stationen.geom) AS geom,
-                COALESCE(messwerte.mess_datum, DATE '1900-01-01') AS mess_datum,
-                COALESCE(messwerte.{column}, -999) AS wert
+                messwerte.mess_datum AS mess_datum,
+                messwerte.{column} AS wert
             FROM stationen
             LEFT JOIN messwerte
-            ON stationen.stations_id = messwerte.stations_id
-            AND messwerte.mess_datum BETWEEN %s AND %s
-            WHERE {conditions}
-            ORDER BY stationen.stations_id, messwerte.{column} {sortierung};
-        """).format(
-            column=sql.Identifier(parameter),
-            conditions=sql.SQL(" AND ").join(conditions) if conditions else sql.SQL("TRUE"),
-            sortierung = sortierung)
-        cur.execute(query, values)
-        rows = cur.fetchall()
-        query = sql.SQL("""
-            SELECT *
-            FROM (
-                SELECT DISTINCT ON (stationen.stations_id)
-                    stationen.von_datum,
-                    stationen.bis_datum,
-                    stationen.stationshoehe,
-                    stationen.stationsname,
-                    stationen.bundesland,
-                    ST_AsGeoJSON(stationen.geom) AS geom,
-                    COALESCE(messwerte.mess_datum, DATE '1900-01-01') AS mess_datum,
-                    COALESCE(messwerte.{column}, -999) AS wert
-                FROM stationen
-                LEFT JOIN messwerte
                 ON stationen.stations_id = messwerte.stations_id
                 AND messwerte.mess_datum BETWEEN %s AND %s
-                WHERE {conditions}
-                ORDER BY stationen.stations_id, messwerte.{column} {sortierung}
-            ) AS sub
-            WHERE wert != -999
-            ORDER BY wert {sortierung} LIMIT 10;
+            WHERE {conditions}
+            AND messwerte.{column} IS NOT NULL
+            ORDER BY stationen.stations_id, messwerte.{column} {sortierung}
         """).format(
             column=sql.Identifier(parameter),
             conditions=sql.SQL(" AND ").join(conditions) if conditions else sql.SQL("TRUE"),
-            sortierung = sortierung)
-        cur.execute(query, values)
-        rows2 = cur.fetchall()
-    else:
-        values = values + [bis_datum, von_datum]
+            sortierung=sortierung
+        )
+        outer_conditions = [sql.SQL("wert != -999")]
+        outer_values = []
+
         if untereschwelle:
+            outer_conditions.append(sql.SQL("wert >= %s"))
+            outer_values.append(float(untereschwelle))
+
+        if obereschwelle:
+            outer_conditions.append(sql.SQL("wert <= %s"))
+            outer_values.append(float(obereschwelle))
+        query_all = sql.SQL("""
+            SELECT *
+            FROM ({inner}) AS sub
+            WHERE {outer_conditions}
+        """).format(
+            inner=inner_query,
+            outer_conditions=sql.SQL(" AND ").join(outer_conditions)
+        )
+
+        cur.execute(query_all, values_inner + outer_values)
+        rows = cur.fetchall()
+
+        query_top10 = sql.SQL("""
+            SELECT *
+            FROM ({inner}) AS sub
+            WHERE {outer_conditions}
+            ORDER BY wert {sortierung}
+            LIMIT 10
+        """).format(
+            inner=inner_query,
+            outer_conditions=sql.SQL(" AND ").join(outer_conditions),
+            sortierung=sortierung
+        )
+        cur.execute(query_top10, values_inner + outer_values)
+        rows2 = cur.fetchall()
+
+    else:
+        # Abfrage für Summe des Niederschlages
+        values = [von_datum, bis_datum] + values + [bis_datum, von_datum]
+        
+        if untereschwelle and obereschwelle:
+            werteingrenzung = sql.SQL("BETWEEN %s AND %s")
+            values = values + [untereschwelle, obereschwelle]
+
+        elif untereschwelle:
             werteingrenzung = sql.SQL(">= %s")
             values = values + [untereschwelle]
-        if obereschwelle:
+
+        elif obereschwelle:
             werteingrenzung = sql.SQL("<= %s")
             values = values + [obereschwelle]
-        if obereschwelle and untereschwelle:
-            werteingrenzung = sql.SQL("<= %s AND >= %s")
-            values = values + [obereschwelle, untereschwelle]
-        else: werteingrenzung = sql.SQL(">= 0")
-         # Abfrage für Summe des Niederschlages
+        else:
+            werteingrenzung = sql.SQL(">0")
 
 
         query = sql.SQL("""

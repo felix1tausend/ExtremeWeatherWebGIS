@@ -173,6 +173,7 @@ watch(
   }
 )
 
+
   function ladeStationenohneWert(station){
     const coords = station.geom
     if (station.wert === -999) {
@@ -194,24 +195,32 @@ watch(
 
 
   function ladeStationenmitWert(station){
-  if (!markerLayer) return;
-  const coords = station.geom;
-  if (!coords || !coords.coordinates) return;
+    if (!markerLayer) return;
+    const coords = station.geom;
+    if (!coords || !coords.coordinates) return;
 
-  const datum = new Date(station.mess_datum);
-  const formattedDatum = new Intl.DateTimeFormat('de-DE', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric'
-  }).format(datum);
+    const datum = new Date(station.mess_datum);
+    const formattedDatum = new Intl.DateTimeFormat('de-DE', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    }).format(datum);
 
-  if (station.wert === -999) return;
+    if (station.wert === -999) return;
+    let popupText = ''
+    if (store.methode === 'rsk_sum'){
+        popupText = `<b>${station.stationsname}</b><br>
+                        Niederschlagssumme: <b>${station.wert} ${store.einheit}</b><br>
+                        Stationshöhe: ${station.stationshoehe} m<br>
+                        Standort: ${coords.coordinates[1]} N ${coords.coordinates[0]} O`;
+    } else{
+        popupText = `<b>${station.stationsname}</b><br>
+                        ${store.parameterbezeichnung}: <b>${station.wert} ${store.einheit}</b><br>
+                        Messdatum: ${formattedDatum}<br>
+                        Stationshöhe: ${station.stationshoehe} m<br>
+                        Standort: ${coords.coordinates[1]} N ${coords.coordinates[0]} O`;
 
-  const popupText = `<b>${station.stationsname}</b><br>
-                     ${store.parameterbezeichnung}: <b>${station.wert} ${store.einheit}</b><br>
-                     Messdatum: ${formattedDatum}<br>
-                     Stationshöhe: ${station.stationshoehe} m<br>
-                     Standort: ${coords.coordinates[1]} N ${coords.coordinates[0]} O`;
+    }
 
   const circleMarker = L.circleMarker(
     [coords.coordinates[1], coords.coordinates[0]],
