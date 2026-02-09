@@ -71,12 +71,12 @@
     <div id ="unterenavbar">
         <ul>
             <li> 
-                <button v-if = "showExtremes === false" class="ergebnisbutton" @click="showExtremes = true"> 
+                <button v-if = "store.showExtremes === false" class="ergebnisbutton" @click="store.showExtremes = true"> 
                     <svg viewBox="0 0 24 24" class="icon" id="icon1">
                         <path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/>
                     </svg>
                 </button> 
-                <button v-else  class="ergebnisbutton" @click="showExtremes = false">
+                <button v-else  class="ergebnisbutton" @click="store.showExtremes = false">
                     <svg viewBox="0 0 24 24" class="icon" id="icon1">
                         <path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/>
                     </svg>
@@ -93,7 +93,7 @@
         </ul>   
     </div>
   </div>
-  <div v-if="showExtremes" class="extrem-panel">
+  <div v-if="store.showExtremes" class="extrem-panel">
     <h3 id="h3-1" > Extremwerte
     </h3>
     <table id="extremwerteliste">
@@ -103,7 +103,7 @@
                 <th>Wert</th>
             </tr>
         </thead>
-        <tr v-for="item in store.extremwerte" :key="item.id"">
+        <tr v-for="item in store.extremwerte" :key="item.id">
            <td> {{ item.stationsname }} </td> <td>{{ item.wert }} {{ store.einheit }}</td>
         </tr>
     </table>
@@ -115,7 +115,6 @@
 import { ref, onMounted } from 'vue'
 import { useStore1 } from '@/stores/store1'
 const store = useStore1()
-const showExtremes = ref(false)
 onMounted(() => {
   store.fetchStationnames()
 })
@@ -262,20 +261,5 @@ td, th{
     border: 1px solid rgb(160 160 160);
     width: 100%;
     height: 100%;
-}
-.close-btn {
-  margin-top: 1em;
-  margin-bottom: 1em;
-  padding: 0.5em 1em;
-  border: 2px solid #4b6380;
-  border-radius: 1px;
-  float: right;
-  background-color: #385170;
-  font-family: 'Ubuntu', system-ui, sans-serif;
-  color: #fff;
-  cursor: pointer;
-}
-.close-btn:hover {
-  background-color: #4b6990;
 }
 </style>

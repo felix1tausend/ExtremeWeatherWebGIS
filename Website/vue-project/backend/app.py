@@ -4,6 +4,8 @@ from configparser import ConfigParser
 from flask_cors import CORS
 from psycopg2 import sql
 import json
+import matplotlib.pyplot as plt
+import numpy as np
 
 app = Flask(__name__)
 CORS(app)
@@ -228,7 +230,6 @@ def expandedsearch():
             inner=inner_query,
             outer_conditions=sql.SQL(" AND ").join(outer_conditions)
         )
-
         cur.execute(query_all, values_inner + outer_values)
         rows = cur.fetchall()
 
@@ -249,22 +250,17 @@ def expandedsearch():
     else:
         # Abfrage für Summe des Niederschlages
         values = [von_datum, bis_datum] + values + [bis_datum, von_datum]
-        
         if untereschwelle and obereschwelle:
             werteingrenzung = sql.SQL("BETWEEN %s AND %s")
             values = values + [untereschwelle, obereschwelle]
-
         elif untereschwelle:
             werteingrenzung = sql.SQL(">= %s")
             values = values + [untereschwelle]
-
         elif obereschwelle:
             werteingrenzung = sql.SQL("<= %s")
             values = values + [obereschwelle]
         else:
             werteingrenzung = sql.SQL(">0")
-
-
         query = sql.SQL("""
             SELECT
                 stationen.von_datum,
@@ -281,7 +277,13 @@ def expandedsearch():
             AND messwerte.mess_datum BETWEEN %s AND %s
             WHERE {conditions}
             AND messwerte.{column} != -999
-            GROUP BY stationen.stations_id
+            GROUP BY stationen.stations_id,
+                stationen.von_datum,
+                stationen.bis_datum,
+                stationen.stationshoehe,
+                stationen.stationsname,
+                stationen.bundesland,
+                stationen.geom
             HAVING COUNT(messwerte.mess_datum) = (DATE %s - DATE %s + 1) AND SUM(messwerte.{column}) {werteingrenzung};
         """).format(
             column=sql.Identifier(parameter),
@@ -310,7 +312,13 @@ def expandedsearch():
             AND messwerte.mess_datum BETWEEN %s AND %s
             WHERE {conditions}
             AND messwerte.{column} != -999
-            GROUP BY stationen.stations_id
+            GROUP BY stationen.stations_id,
+                stationen.von_datum,
+                stationen.bis_datum,
+                stationen.stationshoehe,
+                stationen.stationsname,
+                stationen.bundesland,
+                stationen.geom
             HAVING COUNT(messwerte.mess_datum) = (DATE %s - DATE %s + 1) AND SUM(messwerte.{column}) {werteingrenzung}
             ORDER BY wert {listensortierung} LIMIT 10;
         """).format(
@@ -342,6 +350,7 @@ def expandedsearch():
             "bis_datum": row[1],
             "stationsname": row[3],
             "geom": json.loads(row[5]),
+            "mess_datum": row[6],
             "wert": row[7]
         })
     return jsonify({
@@ -350,14 +359,12 @@ def expandedsearch():
     })
 
 
-
 @app.route("/api/statisticalanalysis", methods=['GET'])
 def statisticalanalysis():
     #Darstellung von komplexeren Trends und Mustern der Wetterdaten mithilfe von Diagrammen
-  
-    analysetyp = request.args.get("analysetyp") #z.b. Hitzetage, Kältetage, zukünftiger trend; in Abhängigkeit davon weitere Auswahlmöglichkeiten
-    von_datum = request.args.get("von_datum")
-    bis_datum = request.args.get("bis_datum")
+    analysetyp = request.args.get("analysetyp") #z.b. Hitzetage, Kältetage, zukünftiger Trend; in Abhängigkeit davon weitere Auswahlmöglichkeiten
+
+    
 
 
 if __name__ == "__main__":

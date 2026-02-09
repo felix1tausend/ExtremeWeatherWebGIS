@@ -20,6 +20,7 @@ export const useStore1 = defineStore('store1', function() {
   const marker = ref([]) //Stationsmarker
   const extremwerte = ref([]) //Extremwertliste
   const suchmodus = ref('fundamental')
+  const showExtremes = ref(false)
 
   watch(suchmodus, (neu) => {
     if (neu === 'fundamental') {
@@ -28,11 +29,16 @@ export const useStore1 = defineStore('store1', function() {
       bis_datum.value = '2024-12-31'
       listensortierung.value = 'desc'
     }
-
     if (neu === 'expanded') {
       messdatum.value = '2024-12-31'
     }
   })
+
+  watch([parameter, methode], () => {
+        showExtremes.value = false
+  })
+
+
 
   const einheit = computed(function() {
       let param
@@ -165,5 +171,5 @@ async function fetchResults() {
     extremwerte.value = json.extremwerte
 }}
 
-  return { parameter, parameterbezeichnung, einheit, messdatum, von_datum, bis_datum, methode,listensortierung, bundesland, stationsname, stationsliste, ausgewählteStationen, fetchStationnames, filteredStations, toggleStation, höheüber, höheunter, untereschwelle, obereschwelle, fundamentalurl, expandedurl, marker, extremwerte, fetchResults, suchmodus}
+  return { parameter, parameterbezeichnung, einheit, messdatum, von_datum, bis_datum, methode,listensortierung, bundesland, stationsname, stationsliste, ausgewählteStationen, fetchStationnames, filteredStations, toggleStation, höheüber, höheunter, untereschwelle, obereschwelle, fundamentalurl, expandedurl, marker, extremwerte, fetchResults, suchmodus, showExtremes}
 })

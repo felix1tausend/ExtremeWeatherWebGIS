@@ -5,7 +5,7 @@
             <ul id ="ul2">
                 <li class="li2"><button class="navbar2button" @click="active = 'fundamental'; store.suchmodus = 'fundamental'">Einfache Suche</button></li>
                 <li class="li2" id = "list2"><button class="navbar2button" @click="active = 'expanded'; store.suchmodus = 'expanded'"> Erweiterte Suche </button></li>
-                <li class="li2" id = "list3"><button class="navbar2button">Statistische Analyse</button></li>
+                <li class="li2" id = "list3"><button class="navbar2button" @click="active = 'statistical'; store.suchmodus = 'statistical'">Statistische Analyse</button></li>
             </ul>
         </div>
           <button
@@ -17,6 +17,7 @@
         </button>
         <FundamentalSearch v-if="active === 'fundamental' " />
         <ExpandedSearch v-if="active === 'expanded'" />
+        <StatisticalAnalysis v-if="active === 'statistical'" />
     </div>
 </template>
 
@@ -25,6 +26,7 @@ import { ref } from 'vue'
 import FundamentalSearch from '@/components/FundamentalSearch.vue'
 import ExpandedSearch from './ExpandedSearch.vue';
 import { useStore1 } from '@/stores/store1'
+import StatisticalAnalysis from './StatisticalAnalysis.vue';
 const store = useStore1()
 const sidebarOpen = ref(true) 
 const active = ref(null)

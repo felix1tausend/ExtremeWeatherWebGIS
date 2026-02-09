@@ -144,7 +144,7 @@ function getLegendItems(einheit, suchmodus, methode) {
       { color: '#90CAF9', label: breaks[4]+' bis '+ breaks[5] + ' mm' },
       { color: '#42A5F5', label: breaks[5]+' bis '+ breaks[6] + ' mm' },
       { color: '#1E88E5', label: breaks[6]+' bis '+ breaks[7] + ' mm' },
-      { color: '#0D47A1', label: '> '+breaks[7]+' mm' }
+      { color: '#0D47A1', label: '> '+ breaks[7] + ' mm' }
     ]
 }return []}
 
