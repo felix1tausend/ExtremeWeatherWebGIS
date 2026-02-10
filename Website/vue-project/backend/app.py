@@ -4,8 +4,12 @@ from configparser import ConfigParser
 from flask_cors import CORS
 from psycopg2 import sql
 import json
+import matplotlib
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
+import io
+import base64
 
 app = Flask(__name__)
 CORS(app)
@@ -359,12 +363,127 @@ def expandedsearch():
     })
 
 
-@app.route("/api/statisticalanalysis", methods=['GET'])
+@app.route("/api/statisticalanalysis/", methods=['GET'])
 def statisticalanalysis():
-    #Darstellung von komplexeren Trends und Mustern der Wetterdaten mithilfe von Diagrammen
-    analysetyp = request.args.get("analysetyp") #z.b. Hitzetage, Kältetage, zukünftiger Trend; in Abhängigkeit davon weitere Auswahlmöglichkeiten
+    analysetyp = request.args.get("analysetyp") 
+    if analysetyp == 'hitze':
+        parameter1 = 'hitzetage'
+        label1 = 'Mittlere Anzahl Hitzetage (> 30°C) pro Jahr'
+        color1 = 'red'
+        parameter2 = 'tmax'
+        label2 = 'Mittlere Jahresmaximaltemperatur'
+        color2 = 'darkred'
+        y_beschriftung = 'Tage | °C'
+        
+    if analysetyp == 'kaelte':
+        parameter1 = 'kaeltetage'
+        label1 = 'Mittlere Anzahl Tage mit starkem Frost (< -10°C) pro Jahr'
+        color1 = 'blue'
+        parameter2 = 'tmin'
+        label2 = 'Mittlere Jahresminimaltemperatur'
+        color2 = 'darkblue'
+        y_beschriftung = '°C | Tage'
+        
+    if analysetyp == 'wind':
+        parameter1 = 'sturmtage'
+        label1 = 'Mittlere Anzahl Sturmtage (mind. Windstärke 8) pro Jahr'
+        color1 = 'grey'
+        parameter2 = 'fmax'
+        label2 = 'Mittlere Jahresmaximalwindgeschwindigkeit'
+        color2 = 'black'
+        y_beschriftung = 'Tage | m/s'
+        
+    if analysetyp == 'regen':
+        parameter1 = 'starkregentage'
+        label1 = 'Mittlere Anzahl Starkregentage (> 20mm/Tag) pro Jahr'
+        color1 = 'blue'
+        parameter2 = 'rmax'
+        label2 = 'Mittlerer Tagesmaximalniederschlag pro Jahr'
+        color2 = 'darkblue'
+        y_beschriftung = 'Tage | mm'
+        
+    if analysetyp == 'trockenheit':
+        parameter1 = 'trockentage'
+        label1 = 'Mittlere Anzahl Trockentage (< 0.1mm/Tag) pro Jahr'
+        color1 = 'orange'
+        parameter2 = 'rsum'
+        label2 = 'Mittlere Jahresniederschlagssumme'
+        color2 = 'blue'
+        y_beschriftung = 'Tage | mm'
+    
+
+    conn = db_connection()
+    cur = conn.cursor()
+    query = sql.SQL("""
+        SELECT
+            statistik.jahr,
+            statistik.{column1},
+            statistik.{column2}
+        FROM statistik
+    """).format(
+        column1=sql.Identifier(parameter1),
+        column2=sql.Identifier(parameter2))
+    cur.execute(query)
+    rows = cur.fetchall()
+    x = []
+    y1 = []
+    y2 = []
+
+    for row in rows:
+        x.append(row[0])
+        y1.append(row[1])
+        y2.append(row[2])
+
+
+
+    x = np.array(x)
+    width = 0.35
+    fig, ax = plt.subplots(figsize=(16,7), facecolor='#4b6380')
+
+    m, n = np.polyfit(np.array(x), y2, 1) #ausgleichende Gerade durch alle Messwerte
+    x2 = np.linspace(1950, 2050, 100)
+    y3 = m * x2 + n
+    ax.plot(x2, y3, linewidth=2, label='langfristiger Trend', color='purple', linestyle="--")
+    
+    m2, n2 = np.polyfit(np.array(x), y1, 1) #ausgleichende Gerade durch alle Messwerte
+    x2 = np.linspace(1950, 2050, 100)
+    y4 = m2 * x2 + n2
+    ax.plot(x2, y4, linewidth=2, color='purple', linestyle="--")
+
+
+
+    ax.bar(x, y1, width, label=label1, color=color1, )
+    ax.plot(x, y2, marker='o', linewidth=2, label=label2, color=color2)
+
+    ax.set_ylabel(y_beschriftung, fontsize=14, color='white') 
+    ax.set_xlabel('Jahr', fontsize=14, color='white') 
+    
+    ax.set_xticks(range(1950, 2050, 5))
+    ax.set_xlim([1949, 2050])
+
+    ax.legend(fontsize=12, loc='upper left', bbox_to_anchor=(0.6, -0.15), facecolor='#4b6380')
+    ax.grid(axis='y', linestyle='--', alpha=0.5)
+    ax.grid(axis='x', linestyle='--', alpha=0.3)
+    plt.tight_layout()
+    ax.set_facecolor('#4b6380')
+
 
     
+    for i, txt in enumerate(y1):
+        plt.annotate(txt, (x[i]-0.8, y1[i]+0.2), fontsize = 6, rotation=-45, color='white')
+    for i, txt in enumerate(y2):
+        plt.annotate(txt, (x[i]-0.4, y2[i]+1), fontsize = 6, color='white')
+    
+
+    buf = io.BytesIO()
+    fig.savefig(buf, format='png', dpi=150)
+    buf.seek(0)
+    plt.close(fig)
+
+    img_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
+    return jsonify({
+        "image": img_base64
+    })
 
 
 if __name__ == "__main__":

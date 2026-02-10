@@ -1,22 +1,33 @@
 <template>
-  <div class="fundamental-search">
+  <div class="searchinterface">
     <h2>Statistische Analyse</h2>
     <div class="bereich">
-        <h3>Basisfilter</h3>
-        <p>Auswertungsmethode:
-            <select v-model="store.methode" class="eingabe">
-            <option value="txk_max">Höchste Temperatur</option>
-            <option value="tnk_min">Niedrigste Temperatur</option>
-            <option value="fx_max">Höchste Windgeschwindigkeit</option>
-            <option value="rsk_max">Höchster Tagesniederschlag</option>
-            <option value="rsk_sum">Niederschlagssumme</option>
-            </select>
-        </p>
+        <h3>Auswertungsmethode: </h3>
+            <label class="label1">
+                <input type="radio" value="hitze" name="analyse" v-model="store.analysetyp">
+                Hitzetage und höchste Temperatur
+            </label><br>
+            <label class="label1">
+                <input type="radio" value="kaelte" name="analyse" v-model="store.analysetyp">
+                Kältetage und niedrigste Temperatur
+            </label><br>
+            <label class="label1">
+                <input type="radio" value="wind" name="analyse" v-model="store.analysetyp">
+                Sturmtage und maximale Windgeschwindigkeit
+            </label><br>
+            <label class="label1">
+                <input type="radio" value="regen" name="analyse" v-model="store.analysetyp">
+                Starkregentage und maximaler Niederschlag
+            </label><br>
+            <label class="label1">
+                <input type="radio" value="trockenheit" name="analyse" v-model="store.analysetyp">
+                Trockentage und jährliche Niederschlagssumme
+            </label>
     </div>
     <div id ="unterenavbar">
         <ul>
             <li> 
-                <button class="ergebnisbutton" @click="store.fetchResults">
+                <button class="ergebnisbutton" @click="store.fetchResults()">
                     <svg viewBox="0 0 24 24" class="icon">
                         <circle cx="11" cy="11" r="7"/>
                         <line x1="16.65" y1="16.65" x2="22" y2="22"/>
@@ -26,6 +37,13 @@
         </ul>   
     </div>
   </div>
+  <div v-if="store.suche" class="modal" @click.self="store.suche = false">
+        <div class="modal-content">
+            <h2>Stationsmesswerte in Deutschland von 1950 bis 2024</h2>
+            <img  id = "diagramm" v-if="store.diagramm" :src="store.diagramm" alt="Diagramm" /> <br>
+            <button class="close-btn" @click="store.suche = false">Schließen</button>
+        </div>
+    </div>
 </template>
 
 
@@ -34,64 +52,32 @@ import { ref, onMounted } from 'vue'
 import { useStore1 } from '@/stores/store1'
 const store = useStore1()
 onMounted(() => {
-  store.fetchStationnames()
+    store.suchmodus = 'statistical'
 })
 
 </script>
 
 <style scoped>
-.fundamental-search {
+.searchinterface {
     height: 100%;
     width: 100%;
     margin: 0px;
     padding: 0.5em;
     font-family: 'Ubuntu', system-ui, sans-serif;
 }
-.bereich{
-    overflow: auto;
-}
-.bereich2{
-    float: right;
-    margin-right: 5%;
-}
-.eingabe{
-    float: right;
-    padding: 2px;
-    margin-right: 5%;
-    background-color: #142d4cd1;
-    border: 2px solid #142d4c;
-    border-radius: 2px;
-    color: white;
-}
+
 .label1{
-    margin-left: 30%;
-}
-::placeholder {
-    color: rgb(192, 190, 190);
-    opacity: 1;
-}
-.eingabe2{
-    float: center;
-    padding: 2px;
-    margin: 0px;
+    display: flex;
+    width: 93%;
+    margin-left: 1%;
+    padding-top: 9px;
+    padding-bottom: 9px;
     background-color: #142d4cd1;
-    border: 2px solid #142d4c;
-    border-radius: 2px;
-    color: white;
+    border: 1px groove #142d4c;
+    border-radius: 4px;
+    color: rgb(255, 255, 255);
+    box-shadow: 0 0 5px rgba(0,0,0,0.3); 
 }
-.eingrenzungstext{
-    margin-bottom: 10px;
-    margin-top: 0px;
-    width: max-content;
-    text-align: left; 
-}
-.werteingrenzung{
-    display: grid;
-    justify-content: right;
-    margin-right: 5%;
-}
-
-
 
 h2{
     text-align: center; 
@@ -101,11 +87,8 @@ h2{
 h3{
     text-align: left; 
     width: 100%;
-    margin-top: 3px;
-    margin-bottom: 5px;
-}
-#h3-1{
-    text-align: center;
+    margin-top: 10px;
+    margin-bottom: 10px;
 }
 p{
     margin-top: 0;
@@ -151,6 +134,38 @@ p{
 #icon1{
     fill: rgb(255, 179, 0);
     stroke: orange;
+}
+
+
+.modal {
+  inset: 0; 
+  z-index: 10000;
+  position: fixed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+  height: max-content;
+  width: max-content;
+  border-radius: 8px;
+  padding-left: 1em;
+  padding-right: 1em;
+  border: 3px solid #4b6380;
+  background-color: #142d4cdc;
+  font-family: 'Ubuntu', sans-serif;
+  text-align: justify;
+  color: #ffffff;
+  overflow: auto;
+}
+
+#diagramm{
+    height: auto;
+    width: auto;
+    background-color: white;
+    border-radius: 4px;
 }
 
 </style>

@@ -21,6 +21,9 @@ export const useStore1 = defineStore('store1', function() {
   const extremwerte = ref([]) //Extremwertliste
   const suchmodus = ref('fundamental')
   const showExtremes = ref(false)
+  const suche = ref(false)
+  const analysetyp = ref('')
+  const diagramm = ref('')
 
   watch(suchmodus, (neu) => {
     if (neu === 'fundamental') {
@@ -37,6 +40,7 @@ export const useStore1 = defineStore('store1', function() {
   watch([parameter, methode], () => {
         showExtremes.value = false
   })
+
 
 
 
@@ -156,7 +160,13 @@ const expandedurl = computed(() => {
   return url.toString()
 })
 
-
+//Statistische Analyse
+const statisticalurl = computed(() => {
+  if (suchmodus.value !== 'statistical') return '';
+  const url = new URL('http://localhost:5000/api/statisticalanalysis/')
+  url.searchParams.set('analysetyp', analysetyp.value)
+  return url.toString()
+})
   // Ergebnis-JSON von Flask holen
 async function fetchResults() {
   if (suchmodus.value === "fundamental"){
@@ -169,7 +179,13 @@ async function fetchResults() {
     const json = await response.json()
     marker.value = json.daten
     extremwerte.value = json.extremwerte
-}}
+  }if (suchmodus.value === "statistical"){
+      suche.value = true
+      const response = await fetch(statisticalurl.value)
+      const json = await response.json()
+      diagramm.value = "data:image/png;base64," + json.image
+  }}
 
-  return { parameter, parameterbezeichnung, einheit, messdatum, von_datum, bis_datum, methode,listensortierung, bundesland, stationsname, stationsliste, ausgewählteStationen, fetchStationnames, filteredStations, toggleStation, höheüber, höheunter, untereschwelle, obereschwelle, fundamentalurl, expandedurl, marker, extremwerte, fetchResults, suchmodus, showExtremes}
+
+  return { parameter, parameterbezeichnung, einheit, messdatum, von_datum, bis_datum, methode,listensortierung, bundesland, stationsname, stationsliste, ausgewählteStationen, fetchStationnames, filteredStations, toggleStation, höheüber, höheunter, untereschwelle, obereschwelle, fundamentalurl, expandedurl, marker, extremwerte, fetchResults, suchmodus, showExtremes, suche, analysetyp, diagramm}
 })

@@ -1,5 +1,5 @@
 <template>
-  <div class="fundamental-search">
+  <div class="searchinterface">
     <h2>Erweiterte Suche</h2>
     <div class="bereich">
         <h3>Basisfilter</h3>
@@ -139,7 +139,7 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.fundamental-search {
+.searchinterface {
     height: 100%;
     width: 100%;
     margin: 0px;
