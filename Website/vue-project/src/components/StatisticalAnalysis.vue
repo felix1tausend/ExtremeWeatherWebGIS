@@ -150,6 +150,7 @@ p{
 .modal-content {
   height: max-content;
   width: max-content;
+  margin-top: 2%;
   border-radius: 8px;
   padding-left: 1em;
   padding-right: 1em;
