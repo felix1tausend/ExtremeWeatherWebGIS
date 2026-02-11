@@ -59,13 +59,17 @@ def gemeinsameAbfrage(parameter):
         values.append(int(höheunter))
     return conditions, values
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DIST_DIR = os.path.join(BASE_DIR, "dist")
+
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def serve_vue(path):
-    if path != "" and os.path.exists("dist/" + path):
-        return send_from_directory('dist', path)
+    file_path = os.path.join(DIST_DIR, path)
+    if path != "" and os.path.exists(file_path):
+        return send_from_directory(DIST_DIR, path)
     else:
-        return send_from_directory('dist', 'index.html')
+        return send_from_directory(DIST_DIR, 'index.html')
     
     
 @app.route("/api/fundamentalsearch/", methods=['GET'])
