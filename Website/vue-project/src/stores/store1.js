@@ -1,6 +1,7 @@
 // stores/store1.js
 import { defineStore } from 'pinia'
 import { ref, computed, watch } from 'vue'
+import { API_BASE_URL } from '@/config'
 
 export const useStore1 = defineStore('store1', function() {
   const parameter = ref('txk')
@@ -138,7 +139,7 @@ export const useStore1 = defineStore('store1', function() {
 // Einfache Suche
 const fundamentalurl = computed(() => {
   if (suchmodus.value !== 'fundamental') return '';
-  const url = new URL('http://localhost:5000/api/fundamentalsearch/')
+  const url = new URL(`${API_BASE_URL}/api/fundamentalsearch/`)
   url.searchParams.set('parameter', parameter.value)
   url.searchParams.set('messdatum', messdatum.value)
   gemeinsameParameter(url)
@@ -148,7 +149,7 @@ const fundamentalurl = computed(() => {
 // Erweiterte Suche
 const expandedurl = computed(() => {
   if (suchmodus.value !== 'expanded') return '';
-  const url = new URL('http://localhost:5000/api/expandedsearch/')
+  const url = new URL(`${API_BASE_URL}/api/expandedsearch/`)
   const [param, aggregation] = methode.value.split('_')
   url.searchParams.set('parameter', param)
   url.searchParams.set('aggregation', aggregation)
@@ -163,7 +164,7 @@ const expandedurl = computed(() => {
 //Statistische Analyse
 const statisticalurl = computed(() => {
   if (suchmodus.value !== 'statistical') return '';
-  const url = new URL('http://localhost:5000/api/statisticalanalysis/')
+  const url = new URL(`${API_BASE_URL}/api/statisticalanalysis/`)
   url.searchParams.set('analysetyp', analysetyp.value)
   return url.toString()
 })
