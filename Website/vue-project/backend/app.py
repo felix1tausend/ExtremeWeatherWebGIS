@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 import psycopg2
 from configparser import ConfigParser
 from flask_cors import CORS
@@ -58,7 +58,15 @@ def gemeinsameAbfrage(parameter):
         values.append(int(höheunter))
     return conditions, values
 
-
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def serve_vue(path):
+    if path != "" and os.path.exists("dist/" + path):
+        return send_from_directory('dist', path)
+    else:
+        return send_from_directory('dist', 'index.html')
+    
+    
 @app.route("/api/fundamentalsearch/", methods=['GET'])
 def fundamentalsearch():
     #Darstellung eines Parameters und festgelegten Tages für die einfache Suchabfrage
