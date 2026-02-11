@@ -15,6 +15,7 @@ import base64
 app = Flask(__name__)
 CORS(app)
 
+
 def db_connection():
     parser = ConfigParser()
     parser.read('database.ini', encoding="utf-8")
@@ -66,6 +67,8 @@ DIST_DIR = os.path.join(BASE_DIR, "dist")
 @app.route('/<path:path>')
 def serve_vue(path):
     file_path = os.path.join(DIST_DIR, path)
+    print("Requested path:", path)
+    print("File exists:", os.path.exists(file_path))
     if path != "" and os.path.exists(file_path):
         return send_from_directory(DIST_DIR, path)
     else:
