@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify, send_from_directory
+import os
 import psycopg2
 from configparser import ConfigParser
 from flask_cors import CORS
