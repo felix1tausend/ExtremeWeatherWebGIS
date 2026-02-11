@@ -70,8 +70,8 @@
         </p>
         <div><p>Stationshöhe:</p>
             <div class="werteingrenzung">
-                <p class="eingrenzungstext"> über &nbsp; <input class ="eingabe2" v-model="store.höheüber"> m</p>
-                <p class="eingrenzungstext">unter <input class ="eingabe2" v-model="store.höheunter"> m</p>
+                <p class="eingrenzungstext"> über &nbsp; <input class ="eingabe2" type="text" @input="store.höheüber = $event.target.value.replace(/[^0-9]/g, '')" v-model="store.höheüber"> m</p>
+                <p class="eingrenzungstext">unter <input class ="eingabe2" type="text" @input="store.höheunter = $event.target.value.replace(/[^0-9]/g, '')" v-model="store.höheunter"> m</p>
             </div>
         </div>
     </div>
@@ -79,8 +79,8 @@
         <h3>Werteingrenzung (optional)</h3>
         <div><p>Messwertebereich:</p>
             <div class="werteingrenzung">
-                <p class="eingrenzungstext"> über &nbsp; <input class="eingabe2" v-model="store.untereschwelle"> {{ store.einheit }}</p>
-                <p class="eingrenzungstext">unter <input class="eingabe2" v-model="store.obereschwelle"> {{ store.einheit }}</p>
+                <p class="eingrenzungstext"> über &nbsp; <input class="eingabe2" type="number" inputmode="decimal" step="0.1" v-model="store.untereschwelle"> {{ store.einheit }}</p>
+                <p class="eingrenzungstext">unter <input class="eingabe2" type="number" inputmode="decimal" step="0.1" v-model="store.obereschwelle"> {{ store.einheit }}</p>
             </div>
         </div>
     </div>

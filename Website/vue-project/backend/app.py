@@ -492,7 +492,7 @@ def statisticalanalysis():
     
 
     buf = io.BytesIO()
-    fig.savefig(buf, format='png', dpi=110, bbox_inches="tight")
+    fig.savefig(buf, format='png', dpi=100, bbox_inches="tight")
     buf.seek(0)
     plt.close(fig)
 

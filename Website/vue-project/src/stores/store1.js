@@ -23,7 +23,7 @@ export const useStore1 = defineStore('store1', function() {
   const suchmodus = ref('fundamental')
   const showExtremes = ref(false)
   const suche = ref(false)
-  const analysetyp = ref('')
+  const analysetyp = ref('hitze')
   const diagramm = ref('')
 
   watch(suchmodus, (neu) => {
