@@ -13,16 +13,16 @@
     <div v-if="showInfo" class="modal" @click.self="showInfo = false">
         <div class="modal-content">
             <h3>Willkommen im Extremwetter WebGIS!</h3>
-            <p> Dieses GIS visualisiert vergangene Extremwetterereignisse ab 1950 in Deutschland. <br>
-                Dabei haben Sie die Möglichkeit, durch weitgehende Analysefunktionen an über 1300 Wetterstationen des Deutschen Wetterdienstes mehr über die Ausmaße von Extremwetter im gesamten Bundesgebiet zu erfahren. <br>
+            <p> Das WebGIS visualisiert vergangene Extremwetterereignisse ab 1950 in Deutschland. <br>
+                Dabei besteht die Möglichkeit, durch weitgehende Analysefunktionen an über 1300 Wetterstationen des Deutschen Wetterdienstes mehr über die Ausmaße von Extremwetter im gesamten Bundesgebiet zu erfahren. <br>
                 <br>
-                Im Zuge dessen können Sie nach den 4 ausschlaggebenden Parametern <strong>Tagesmaximaltemperatur</strong>, <strong>Tagesminaimaltemperatur</strong>, <strong>Tageshöchstwindgeschwindigkeit</strong> und <strong>Tagesniederschlagssumme</strong> analysieren. <br>
+                Im Zuge dessen können Sie nach den 5 ausschlaggebenden Parametern <strong>Tagesmaximaltemperatur</strong>, <strong>Tagesminimaltemperatur</strong>, <strong>Tageshöchstwindgeschwindigkeit</strong>, <strong>Tagesniederschlagssumme</strong> und in der erweiterteten Suche nach der <strong>Gesamtniederschlagssumme</strong> analysieren. <br>
                 Die 3 im WebGIS vorkommenden Analysebereiche <i>Einfache Suche</i>, <i>Erweiterte Suche</i> und <i>Statistische Analyse</i> bieten hierbei eine logische Strukturierung, um den Einsatz des GIS effizient zu organisieren. <br>
                 <br>
                 Die <i>Einfache Suche</i> eignet sich für die Filterung nach bestimmten Wertebereichen der Messwerte an einem festgelegten Tag. <br>
                 Der Bereich <i>Erweiterte Suche</i> ist hingegen besonders geeignet, um innerhalb eines individuell festgelegten Zeitabschnittes Durchschnitts- Maximal- oder Minimalmesswerte zu identifizieren. <br>
                 Die <i>Statistische Analyse</i> ist schlussendlich für längerfristige Auswertung von Trends aus den Messdaten nützlich. <br>
-                Dabei soll die historische sowie mögliche zukünftige Entwicklung der 4 Parameter durch vorgefertigte Analysen näher beleuchtet werden.
+                Dabei soll die historische sowie mögliche zukünftige Entwicklung der 5 Parameter durch vorgefertigte Analysen näher beleuchtet werden.
 
                 </p>
             <button class="close-btn" @click="showInfo = false">Schließen</button>

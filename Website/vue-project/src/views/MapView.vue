@@ -1,7 +1,6 @@
 <template>
   <div class="map-view">
     <NavBar></NavBar>
-    <LayerControl></LayerControl>
     <BasicSearchInterface></BasicSearchInterface>
     <Map v-if="store.marker" :stations="store.marker" />
   </div>
@@ -11,9 +10,9 @@
 import { useStore1 } from '@/stores/store1'
 const store = useStore1()
 import NavBar from '../components/NavBar.vue'
-import LayerControl from '@/components/LayerControl.vue'
 import Map from '../components/Map.vue'
 import BasicSearchInterface from '@/components/BasicSearchInterface.vue'
+
 
 
 </script>

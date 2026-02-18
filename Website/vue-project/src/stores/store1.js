@@ -130,9 +130,9 @@ export const useStore1 = defineStore('store1', function() {
       url.searchParams.set('höheüber', höheüber.value)
     if (höheunter.value)
       url.searchParams.set('höheunter', höheunter.value)
-    if (untereschwelle.value)
+    if (untereschwelle.value != null || untereschwelle != undefined)
       url.searchParams.set('untereschwelle', untereschwelle.value)
-    if (obereschwelle.value)
+    if (obereschwelle.value != null || obereschwelle != undefined)
       url.searchParams.set('obereschwelle', obereschwelle.value)
   }
 

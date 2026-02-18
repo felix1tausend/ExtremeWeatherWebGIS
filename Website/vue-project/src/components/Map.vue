@@ -103,19 +103,19 @@ function getLegendItems(einheit, suchmodus, methode) {
   if (einheit === 'm/s') {
     return [
       { color: 'lightgray', label: 'keine Daten' },
-      { color: '#FFFFFF', label: '< 0.3 (Bft 0)' },
-      { color: '#B0E1F7', label: '0.3 bis 1.6 (Bft 1)' },
-      { color: '#81D4FA', label: '1.6 bis 3.4 (Bft 2)' },
-      { color: '#4FC3F7', label: '3.4 bis 5.5 (Bft 3)' },
-      { color: '#4CAF50', label: '5.5 bis 8.0 (Bft 4)' },
-      { color: '#CDDC39', label: '8.0 bis 10.8 (Bft 5)' },
-      { color: '#FFEB3B', label: '10.8 bis 13.9 (Bft 6)' },
-      { color: '#FFC107', label: '13.9 bis 17.2 (Bft 7)' },
-      { color: '#FF9800', label: '17.2 bis 20.8 (Bft 8)' },
-      { color: '#F44336', label: '20.8 bis 24.5 (Bft 9)' },
-      { color: '#D32F2F', label: '24.5 bis 28.5 (Bft 10)' },
-      { color: '#7B1FA2', label: '28.5 bis 32.7 (Bft 11)' },
-      { color: '#4A148C', label: '> 32.7 (Bft 12)' }
+      { color: '#FFFFFF', label: '< 0.3 m/s (Bft 0)' },
+      { color: '#B0E1F7', label: '0.3 bis 1.6 m/s (Bft 1)' },
+      { color: '#81D4FA', label: '1.6 bis 3.4 m/s (Bft 2)' },
+      { color: '#4FC3F7', label: '3.4 bis 5.5 m/s (Bft 3)' },
+      { color: '#4CAF50', label: '5.5 bis 8.0 m/s (Bft 4)' },
+      { color: '#CDDC39', label: '8.0 bis 10.8 m/s (Bft 5)' },
+      { color: '#FFEB3B', label: '10.8 bis 13.9 m/s (Bft 6)' },
+      { color: '#FFC107', label: '13.9 bis 17.2 m/s (Bft 7)' },
+      { color: '#FF9800', label: '17.2 bis 20.8 m/s (Bft 8)' },
+      { color: '#F44336', label: '20.8 bis 24.5 m/s (Bft 9)' },
+      { color: '#D32F2F', label: '24.5 bis 28.5 m/s (Bft 10)' },
+      { color: '#7B1FA2', label: '28.5 bis 32.7 m/s (Bft 11)' },
+      { color: '#4A148C', label: '> 32.7 m/s (Bft 12)' }
     ]
   }
 
