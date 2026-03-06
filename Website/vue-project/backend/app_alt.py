@@ -1,4 +1,5 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
+import os
 import psycopg2
 from configparser import ConfigParser
 from flask_cors import CORS
@@ -29,14 +30,6 @@ def db_connection():
     )
     return conn
 
-def einheit(parameter):
-    if parameter == 'txk' or parameter == 'tnk':
-        return '°C'
-    if parameter == 'rsk':
-        return 'mm'
-    if parameter == 'fx':
-        return 'm/s'
-
 def gemeinsameAbfrage():
     bundesland = request.args.get("bundesland") #optional
     stationsnamen_raw = request.args.get("stationsnamen") #optional
@@ -63,8 +56,6 @@ def gemeinsameAbfrage():
         conditions.append(sql.SQL("stationen.stationshoehe < %s"))
         values.append(int(höheunter))
     return conditions, values
-
-
 
 
 @app.route("/api/fundamentalsearch/", methods=['GET'])
@@ -106,9 +97,35 @@ def fundamentalsearch():
     cur.execute(query, values)
     rows = cur.fetchall()
 
+    if parameter == "tnk":
+        conditions.append(sql.SQL("messwerte.{column} != -999 ORDER BY messwerte.{column} ASC LIMIT 10 ").format(column=sql.Identifier(parameter)))
+    else:
+        conditions.append(sql.SQL("messwerte.{column} != -999 ORDER BY messwerte.{column} DESC LIMIT 10 ").format(column=sql.Identifier(parameter)))
+    query = sql.SQL("""
+        SELECT
+            stationen.von_datum,
+            stationen.bis_datum,
+            stationen.stationshoehe,
+            stationen.stationsname,
+            stationen.bundesland,
+            ST_AsGeoJSON(stationen.geom) AS geom,
+            COALESCE(messwerte.mess_datum, %s) AS mess_datum,
+            COALESCE(messwerte.{column}, -999) AS wert
+        FROM stationen
+        LEFT JOIN messwerte
+        ON stationen.stations_id = messwerte.stations_id
+        AND messwerte.mess_datum = %s
+        WHERE {conditions}
+    """).format(
+        column=sql.Identifier(parameter),
+        conditions=sql.SQL(" AND ").join(conditions) if conditions else sql.SQL("TRUE"))
+    cur.execute(query, values)
+    rows2 = cur.fetchall()
+    cur.close()
+    conn.close()
+
     data = []
     extremwerte = []
-    einh = einheit(parameter)
     for row in rows:
         data.append({
             "von_datum": row[0],
@@ -118,16 +135,21 @@ def fundamentalsearch():
             "bundesland": row[4],
             "geom": json.loads(row[5]),
             "mess_datum": row[6],
-            "wert": row[7],
-            "einheit": einh
+            "wert": row[7]
         })
-        # Top 10 Werte filtern
-        if parameter == "tnk":
-            # Minimalwerte für tnk
-            extremwerte = sorted([x for x in data if x["wert"] != -999], key=lambda x: x["wert"])[:10]
-        else:
-            # Maximalwerte für andere Parameter
-            extremwerte = sorted(data, key=lambda x: x["wert"], reverse=True)[:10]
+    for row in rows2:
+        extremwerte.append({
+            "von_datum": row[0],
+            "bis_datum": row[1],
+            "stationsname": row[3],
+            "geom": json.loads(row[5]),
+            "wert": row[7]
+        })
+
+
+
+
+        
     return jsonify({
         "daten": data,
         "extremwerte": extremwerte
@@ -136,27 +158,29 @@ def fundamentalsearch():
 
 
 
-
 @app.route("/api/expandedsearch/", methods=['GET'])
 def expandedsearch():
     rows = []
+    rows2 = []
     parameter = request.args.get("parameter")
     von_datum = request.args.get("von_datum")
     bis_datum = request.args.get("bis_datum")
     aggregation = request.args.get("aggregation") # erlaubt: max | min | sum
-    listensortierung = request.args.get("listensortierung") #falls aggregation = sum, kann zwischen den trockensten und nassesten Stationenen in der Extremwertliste unterschieden werden
+    listensortierung = request.args.get("listensortierung") #falls sum für Niederschlag gesetzt, kann zwischen den trockensten und nassesten Stationenen in der Extremwertliste unterschieden werden
     untereschwelle = request.args.get("untereschwelle")#optional
     obereschwelle = request.args.get("obereschwelle")#optional
     
     conditions, values = gemeinsameAbfrage()
     conn = db_connection()
     cur = conn.cursor()
+
     if aggregation != "sum":
         values_inner = [von_datum, bis_datum] + values
         if parameter == "tnk":
             sortierung = sql.SQL("ASC")
         else:
             sortierung = sql.SQL("DESC")
+
         # Abfrage für Minimal- oder Maximalwerte
         inner_query = sql.SQL("""
             SELECT DISTINCT ON (stationen.stations_id)
@@ -174,7 +198,6 @@ def expandedsearch():
                 AND messwerte.mess_datum BETWEEN %s AND %s
             WHERE {conditions}
             AND messwerte.{column} IS NOT NULL
-            AND messwerte.{column} != -999
             ORDER BY stationen.stations_id, messwerte.{column} {sortierung}
         """).format(
             column=sql.Identifier(parameter),
@@ -196,9 +219,23 @@ def expandedsearch():
             WHERE {outer_conditions}
         """).format(
             inner=inner_query,
-            outer_conditions=sql.SQL(" AND ").join(outer_conditions))
+            outer_conditions=sql.SQL(" AND ").join(outer_conditions)
+        )
         cur.execute(query_all, values_inner + outer_values)
         rows = cur.fetchall()
+        query_top10 = sql.SQL("""
+            SELECT *
+            FROM ({inner}) AS sub
+            WHERE {outer_conditions}
+            ORDER BY wert {sortierung}
+            LIMIT 10
+        """).format(
+            inner=inner_query,
+            outer_conditions=sql.SQL(" AND ").join(outer_conditions),
+            sortierung=sortierung
+        )
+        cur.execute(query_top10, values_inner + outer_values)
+        rows2 = cur.fetchall()
 
     else:
         # Abfrage für Summe des Niederschlages
@@ -244,12 +281,48 @@ def expandedsearch():
             werteingrenzung = werteingrenzung)
         cur.execute(query, values)
         rows = cur.fetchall()
+
+        if listensortierung == "desc":
+            listsort = sql.SQL("DESC")
+        if listensortierung == "asc":
+             listsort = sql.SQL("ASC")
+        query = sql.SQL("""
+            SELECT
+                stationen.von_datum,
+                stationen.bis_datum,
+                stationen.stationshoehe,
+                stationen.stationsname,
+                stationen.bundesland,
+                ST_AsGeoJSON(stationen.geom) AS geom,
+                MAX(messwerte.mess_datum) AS mess_datum,
+                ROUND (SUM(messwerte.{column})::numeric,0) AS wert
+            FROM stationen
+            JOIN messwerte
+            ON stationen.stations_id = messwerte.stations_id
+            AND messwerte.mess_datum BETWEEN %s AND %s
+            WHERE {conditions}
+            AND messwerte.{column} != -999
+            GROUP BY stationen.stations_id,
+                stationen.von_datum,
+                stationen.bis_datum,
+                stationen.stationshoehe,
+                stationen.stationsname,
+                stationen.bundesland,
+                stationen.geom
+            HAVING COUNT(messwerte.mess_datum) = (DATE %s - DATE %s + 1) AND SUM(messwerte.{column}) {werteingrenzung}
+            ORDER BY wert {listensortierung} LIMIT 10;
+        """).format(
+            column=sql.Identifier(parameter),
+            conditions=sql.SQL(" AND ").join(conditions) if conditions else sql.SQL("TRUE"),
+            werteingrenzung = werteingrenzung,
+            listensortierung = listsort)
+        cur.execute(query, values)
+        rows2 = cur.fetchall()
     cur.close()
     conn.close()
-    
+
     data = []
     extremwerte = []
-    einh = einheit(parameter)
     for row in rows:
         data.append({
             "von_datum": row[0],
@@ -259,22 +332,21 @@ def expandedsearch():
             "bundesland": row[4],
             "geom": json.loads(row[5]),
             "mess_datum": row[6],
-            "wert": row[7],
-            "einheit": einh
+            "wert": row[7]
         })
-            # Top 10 Werte filtern
-        if parameter == "tnk" or listensortierung == "asc":
-            # Minimalwerte für tnk und nasseste Stationen
-            extremwerte = sorted(data, key=lambda x: x["wert"])[:10]
-        else:
-            # Maximalwerte für andere Parameter trockenste Stationen
-            extremwerte = sorted(data, key=lambda x: x["wert"], reverse=True)[:10]
+    for row in rows2:
+        extremwerte.append({
+            "von_datum": row[0],
+            "bis_datum": row[1],
+            "stationsname": row[3],
+            "geom": json.loads(row[5]),
+            "mess_datum": row[6],
+            "wert": row[7]
+        })
     return jsonify({
         "daten": data,
         "extremwerte": extremwerte
     })
-
-
 
 
 @app.route("/api/statisticalanalysis/", methods=['GET'])
@@ -282,44 +354,49 @@ def statisticalanalysis():
     analysetyp = request.args.get("analysetyp") 
     if analysetyp == 'hitze':
         parameter1 = 'hitzetage'
-        label1 = 'Mittlere Anzahl Hitzetage (>= 30°C) pro Jahr'
+        label1 = 'Mittlere Anzahl Hitzetage (> 30°C) pro Jahr'
         color1 = 'red'
         parameter2 = 'tmax'
         label2 = 'Mittlere Jahresmaximaltemperatur'
         color2 = 'darkred'
         y_beschriftung = 'Tage | °C'
+        
     if analysetyp == 'kaelte':
         parameter1 = 'kaeltetage'
-        label1 = 'Mittlere Anzahl Tage mit starkem Frost (<= -10°C) pro Jahr'
+        label1 = 'Mittlere Anzahl Tage mit starkem Frost (< -10°C) pro Jahr'
         color1 = 'blue'
         parameter2 = 'tmin'
         label2 = 'Mittlere Jahresminimaltemperatur'
         color2 = 'darkblue'
         y_beschriftung = '°C | Tage'
+        
     if analysetyp == 'wind':
         parameter1 = 'sturmtage'
-        label1 = 'Mittlere Anzahl Sturmtage (mind. Windstärke 9) pro Jahr'
+        label1 = 'Mittlere Anzahl Sturmtage (mind. Windstärke 8) pro Jahr'
         color1 = 'grey'
         parameter2 = 'fmax'
         label2 = 'Mittlere Jahresmaximalwindgeschwindigkeit'
         color2 = 'black'
         y_beschriftung = 'Tage | m/s'
+        
     if analysetyp == 'regen':
         parameter1 = 'starkregentage'
-        label1 = 'Mittlere Anzahl Starkregentage (>= 20mm/Tag) pro Jahr'
+        label1 = 'Mittlere Anzahl Starkregentage (> 20mm/Tag) pro Jahr'
         color1 = 'blue'
         parameter2 = 'rmax'
         label2 = 'Mittlerer Tagesmaximalniederschlag pro Jahr'
         color2 = 'darkblue'
         y_beschriftung = 'Tage | mm'
+        
     if analysetyp == 'trockenheit':
         parameter1 = 'trockentage'
-        label1 = 'Mittlere Anzahl Trockentage (<= 0.1mm/Tag) pro Jahr'
+        label1 = 'Mittlere Anzahl Trockentage (< 0.1mm/Tag) pro Jahr'
         color1 = 'orange'
         parameter2 = 'rsum'
         label2 = 'Mittlere Jahresniederschlagssumme'
         color2 = 'blue'
         y_beschriftung = 'Tage | mm'
+    
 
     conn = db_connection()
     cur = conn.cursor()
@@ -337,13 +414,18 @@ def statisticalanalysis():
     x = []
     y1 = []
     y2 = []
+
     for row in rows:
         x.append(row[0])
         y1.append(row[1])
         y2.append(row[2])
+
+
+
     x = np.array(x)
     width = 0.35
     fig, ax = plt.subplots(figsize=(16,7), facecolor='#4b6380')
+
     m, n = np.polyfit(np.array(x), y2, 1) #ausgleichende Gerade durch alle Messwerte
     x2 = np.linspace(1950, 2050, 100)
     y3 = m * x2 + n
@@ -353,32 +435,45 @@ def statisticalanalysis():
     x2 = np.linspace(1950, 2050, 100)
     y4 = m2 * x2 + n2
     ax.plot(x2, y4, linewidth=2, color='purple', linestyle="--")
+
+
+
     ax.bar(x, y1, width, label=label1, color=color1, )
     ax.plot(x, y2, marker='o', linewidth=2, label=label2, color=color2)
+
     ax.set_ylabel(y_beschriftung, fontsize=14, color='white') 
     ax.set_xlabel('Jahr', fontsize=14, color='white') 
+    
     ax.set_xticks(range(1950, 2050, 5))
     ax.set_xlim([1949, 2050])
+
     ax.legend(fontsize=12, loc='upper left', bbox_to_anchor=(0.6, -0.15), facecolor='#4b6380')
     ax.grid(axis='y', linestyle='--', alpha=0.5)
     ax.grid(axis='x', linestyle='--', alpha=0.3)
     plt.tight_layout()
     ax.set_facecolor('#4b6380')
 
+
+    
     for i, txt in enumerate(y1):
         plt.annotate(txt, (x[i]-0.8, y1[i]+0.2), fontsize = 6, rotation=-45, color='white')
     for i, txt in enumerate(y2):
         plt.annotate(txt, (x[i]-0.4, y2[i]+1), fontsize = 6, color='white')
+    
+
     buf = io.BytesIO()
     fig.savefig(buf, format='png', dpi=100, bbox_inches="tight")
     buf.seek(0)
     plt.close(fig)
+
     img_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
     return jsonify({
         "image": img_base64
     })
 
 
+
+
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=5000, debug=True)
 

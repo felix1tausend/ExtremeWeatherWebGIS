@@ -6,30 +6,25 @@ import 'leaflet-groupedlayercontrol/dist/leaflet.groupedlayercontrol.min.css'
 import 'leaflet-groupedlayercontrol'
 import { useStore1 } from '@/stores/store1'
 const store = useStore1()
+
 let map
 let markerLayer
 let osm, google, otp, esris, esrit
-let groupedLayerControl
 let legendControl
-
-const props = defineProps({
-  stations: {
-    type: Array,
-    required: true
-  }
-})
-
+let groupedLayerControl
 
 onMounted(async function() {
-
-
   map = L.map('map',{
   center: [51, 10],
-  zoom: 7,
-  zoomControl: false, 
+  zoom: 6,
+    maxBounds: [
+      [40, -10], // Südwest (Breite, Länge)
+      [60, 30]   // Nordost (Breite, Länge)
+    ],
+  maxBoundsViscosity: 1.0,
+  zoomControl: false
+  
   });
-
-  addLegend(store.einheit, store.suchmodus, store.methode)
 
   osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   maxZoom: 19,
@@ -51,16 +46,174 @@ onMounted(async function() {
   attribution: 'Tiles &copy; Esri &mdash; Topographic'
   }).addTo(map);
 
-markerLayer = L.layerGroup().addTo(map)
+  markerLayer = L.layerGroup().addTo(map)
 
-const baseMaps = { "OpenStreetMap": osm, "OpenTopoMap": otp, "Satellit": google, 'ESRI Street Map': esris, 'ESRI Topographic': esrit};
-const overlayMaps = { "Stationsmesswerte": { 'Wetterstationen' :  markerLayer } }
-
-groupedLayerControl = L.control.groupedLayers(baseMaps, overlayMaps,{ 
-  position: 'topright'}).addTo(map);
+  const baseMaps = { "OpenStreetMap": osm, "OpenTopoMap": otp, "Satellit": google, 'ESRI Street Map': esris, 'ESRI Topographic': esrit};
+  const overlayMaps = { "Stationsmesswerte": { 'Wetterstationen' :  markerLayer } }
+  groupedLayerControl = L.control.groupedLayers(baseMaps, overlayMaps,{ 
+    position: 'topright'}).addTo(map);
 
 })
 
+
+
+
+const props = defineProps({
+  stations: {
+    type: Array,
+    required: true
+  }
+})
+
+watch(
+  function () {
+    return props.stations
+  },
+  function (newStations) {
+    markerLayer.clearLayers()
+    for (let i = 0; i < newStations.length; i++) {
+      const station = newStations[i]
+      if (station.wert === -999) {
+        ladeStationenohneWert(station)
+      }
+    }
+    for (let i = 0; i < newStations.length; i++) {
+      const station = newStations[i]
+      if (station.wert !== -999) {
+        ladeStationenmitWert(station, store.methode)
+      }
+    }
+    addLegend(store.einheit, store.suchmodus, store.methode)
+  }
+)
+
+
+  function ladeStationenohneWert(station){
+    const coords = station.geom
+    let popupText = `<b>${station.stationsname}</b><br>
+                        ${store.parameterbezeichnung}: keine Messung </b><br>
+                        Stationshöhe: ${station.stationshoehe} m<br>
+                        Standort: ${coords.coordinates[1]} N ${coords.coordinates[0]} O`;
+    const circleMarker = L.circleMarker(
+          [coords.coordinates[1], coords.coordinates[0]],
+          {
+            radius: 7,
+            fillColor: 'lightgray',
+            color: 'black',
+            weight: 0.5,
+            opacity: 0.4,
+            fillOpacity: 0.2,
+          }
+          ).bindPopup(popupText)
+    circleMarker.addTo(markerLayer)
+    }
+
+  function ladeStationenmitWert(station){
+    const datum = new Date(station.mess_datum);
+    const formattedDatum = new Intl.DateTimeFormat('de-DE', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric'
+        }).format(datum);
+    const coords = station.geom
+    let popupText = ''
+        if (store.methode === 'rsk_sum'){
+            popupText = `<b>${station.stationsname}</b><br>
+                            Niederschlagssumme: <b>${station.wert} ${store.einheit}</b><br>
+                            Stationshöhe: ${station.stationshoehe} m<br>
+                            Standort: ${coords.coordinates[1]} N ${coords.coordinates[0]} O`;
+        } else{
+            popupText = `<b>${station.stationsname}</b><br>
+                            ${store.parameterbezeichnung}: <b>${station.wert} ${store.einheit}</b><br>
+                            Messdatum: ${formattedDatum}<br>
+                            Stationshöhe: ${station.stationshoehe} m<br>
+                            Standort: ${coords.coordinates[1]} N ${coords.coordinates[0]} O`;
+        }
+    const circleMarker = L.circleMarker(
+          [coords.coordinates[1], coords.coordinates[0]],
+          { 
+            radius: 7,
+            fillColor: getColorByValue(station.wert, store.einheit, store.suchmodus, store.methode, props.stations),
+            color: 'black',
+            weight: 0.5,
+            opacity: 0.4,
+            fillOpacity: 0.8
+          }
+          ).bindPopup(popupText);
+    circleMarker.addTo(markerLayer);
+  }
+
+
+  function getColorByValue(wert, einheit, suchmodus, methode, stations) {
+    if (einheit === '°C') {
+      if (wert < -30) return '#360259'
+      if (wert < -20) return '#00305A'
+      if (wert < -10) return '#0288D1'
+      if (wert < 0)   return '#0EEAFF'
+      if (wert < 10)  return '#45BF55'
+      if (wert < 20)  return '#FFE11A'
+      if (wert < 30)  return '#F2B705'
+      if (wert < 40)  return '#D23600'
+      return '#440505'
+    }
+    if (einheit === 'm/s') {
+      if (wert < 0.3)  return '#FFFFFF'  // Bft 0 
+      if (wert < 1.6)  return '#B0E1F7'  // Bft 1
+      if (wert < 3.4)  return '#81D4FA'  // Bft 2
+      if (wert < 5.5)  return '#4FC3F7'  // Bft 3
+      if (wert < 8.0)  return '#4CAF50'  // Bft 4
+      if (wert < 10.8) return '#CDDC39'  // Bft 5
+      if (wert < 13.9) return '#FFEB3B'  // Bft 6
+      if (wert < 17.2) return '#FFC107'  // Bft 7
+      if (wert < 20.8) return '#FF9800'  // Bft 8
+      if (wert < 24.5) return '#F44336'  // Bft 9
+      if (wert < 28.5) return '#D32F2F'  // Bft 10
+      if (wert < 32.7) return '#7B1FA2'  // Bft 11
+      return '#4A148C'                   // Bft 12
+    }
+    if ((einheit === 'mm' && suchmodus ==='fundamental') ||   (suchmodus === 'expanded' && methode === 'rsk_max') ) {
+      if (wert < 0.1)  return '#FFFFFF'
+      if (wert < 1)    return '#E3F2FD'
+      if (wert < 5)    return '#90CAF9'
+      if (wert < 10)   return '#42A5F5'
+      if (wert < 20)   return '#1E88E5'
+      if (wert < 30)   return '#1565C0'
+      if (wert < 50)   return '#6A1B9A'
+      if (wert < 100)  return '#AD1457'
+      return '#B71C1C'
+    }                 
+    if (einheit === 'mm' && suchmodus === 'expanded' && methode === 'rsk_sum') {
+    const breaks = getBreaks(stations)
+    const colors = [
+      '#FFFFFF',
+      '#E3F2FD',
+      '#90CAF9',
+      '#42A5F5',
+      '#1E88E5',
+      '#1565C0',
+      '#6A1B9A',
+      '#AD1457',
+      '#B71C1C'
+    ]
+    for (let i = 0; i < breaks.length; i++) {
+      if (wert < breaks[i]) return colors[i]
+    }
+    return colors[colors.length - 1]
+  }
+}
+
+function getBreaks(stations, n = 9) {
+  const werte = stations.map(s => s.wert)
+  const min = Math.min(...werte)
+  const max = Math.max(...werte)
+  const range = max - min
+  const breaks = []
+  for (let k = 1; k < n; k++) {
+    const value =(min + Math.pow(k / n, 2) * range) // quadratische Klassifizierung
+    breaks.push(Math.round(value))
+  }
+  return breaks
+}
 
 
 function addLegend(einheit, suchmodus, methode) {
@@ -136,183 +289,17 @@ function getLegendItems(einheit, suchmodus, methode) {
   if (einheit === 'mm' && suchmodus === 'expanded' && methode === 'rsk_sum') {
     const breaks = getBreaks(props.stations)
     return[
-      { color: '#B71C1C', label: ' < '+ breaks[0]+ ' mm' },
-      { color: '#D32F2F', label: breaks[0]+' bis '+ breaks[1] + ' mm' },
-      { color: '#F44336', label: breaks[1]+' bis '+ breaks[2] + ' mm' },
-      { color: '#FB8C00', label: breaks[2]+' bis '+ breaks[3] + ' mm' },
-      { color: '#FDD835', label: breaks[3]+' bis '+ breaks[4] + ' mm' },
-      { color: '#90CAF9', label: breaks[4]+' bis '+ breaks[5] + ' mm' },
-      { color: '#42A5F5', label: breaks[5]+' bis '+ breaks[6] + ' mm' },
-      { color: '#1E88E5', label: breaks[6]+' bis '+ breaks[7] + ' mm' },
-      { color: '#0D47A1', label: '> '+ breaks[7] + ' mm' }
+      { color: '#FFFFFF', label: ' < '+ breaks[0]+ ' mm' },
+      { color: '#E3F2FD', label: breaks[0]+' bis '+ breaks[1] + ' mm' },
+      { color: '#90CAF9', label: breaks[1]+' bis '+ breaks[2] + ' mm' },
+      { color: '#42A5F5', label: breaks[2]+' bis '+ breaks[3] + ' mm' },
+      { color: '#1E88E5', label: breaks[3]+' bis '+ breaks[4] + ' mm' },
+      { color: '#1565C0', label: breaks[4]+' bis '+ breaks[5] + ' mm' },
+      { color: '#6A1B9A', label: breaks[5]+' bis '+ breaks[6] + ' mm' },
+      { color: '#AD1457', label: breaks[6]+' bis '+ breaks[7] + ' mm' },
+      { color: '#B71C1C', label: '> '+ breaks[7] + ' mm' }
     ]
 }return []}
-
-
-
-
-watch(
-  function () {
-    return props.stations
-  },
-  function (newStations) {
-    markerLayer.clearLayers()
-    for (let i = 0; i < newStations.length; i++) {
-      const station = newStations[i]
-      if (station.wert === -999) {
-        ladeStationenohneWert(station)
-      }
-    }
-    for (let i = 0; i < newStations.length; i++) {
-      const station = newStations[i]
-      if (station.wert !== -999) {
-        ladeStationenmitWert(station, store.methode)
-      }
-    }
-    addLegend(store.einheit, store.suchmodus, store.methode)
-  }
-)
-
-
-  function ladeStationenohneWert(station){
-    const coords = station.geom
-    if (station.wert === -999) {
-      let popupText = "<b>" + station.stationsname + "</b><br>"
-                + store.parameterbezeichnung + ": keine Messung"
-      const circleMarker = L.circleMarker(
-      [coords.coordinates[1], coords.coordinates[0]],
-      {
-        radius: 7,
-        fillColor: getColorByValue(station.wert, store.einheit, store.suchmodus, store.methode, props.stations),
-        color: 'black',
-        weight: 0.5,
-        opacity: 0.4,
-        fillOpacity: 0.2,
-      }
-    ).bindPopup(popupText)
-    circleMarker.addTo(markerLayer)
-    }}
-
-
-  function ladeStationenmitWert(station){
-    if (!markerLayer) return;
-    const coords = station.geom;
-    if (!coords || !coords.coordinates) return;
-
-    const datum = new Date(station.mess_datum);
-    const formattedDatum = new Intl.DateTimeFormat('de-DE', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    }).format(datum);
-
-    if (station.wert === -999) return;
-    let popupText = ''
-    if (store.methode === 'rsk_sum'){
-        popupText = `<b>${station.stationsname}</b><br>
-                        Niederschlagssumme: <b>${station.wert} ${store.einheit}</b><br>
-                        Stationshöhe: ${station.stationshoehe} m<br>
-                        Standort: ${coords.coordinates[1]} N ${coords.coordinates[0]} O`;
-    } else{
-        popupText = `<b>${station.stationsname}</b><br>
-                        ${store.parameterbezeichnung}: <b>${station.wert} ${store.einheit}</b><br>
-                        Messdatum: ${formattedDatum}<br>
-                        Stationshöhe: ${station.stationshoehe} m<br>
-                        Standort: ${coords.coordinates[1]} N ${coords.coordinates[0]} O`;
-
-    }
-
-  const circleMarker = L.circleMarker(
-    [coords.coordinates[1], coords.coordinates[0]],
-    { 
-      radius: 7,
-      fillColor: getColorByValue(station.wert, store.einheit, store.suchmodus, store.methode, props.stations),
-      color: 'black',
-      weight: 0.5,
-      opacity: 0.4,
-      fillOpacity: 0.8
-    }
-  ).bindPopup(popupText);
-
-  circleMarker.addTo(markerLayer);
-}
-
-function getBreaks(stations, n = 9) {
-  const werte = stations.map(s => s.wert)
-  const min = Math.min(...werte)
-  const max = Math.max(...werte)
-  const range = max - min
-  const breaks = []
-  for (let k = 1; k < n; k++) {
-    const value =(min + Math.pow(k / n, 2) * range) // quadratische Klassifizierung
-    breaks.push(Math.round(value * 100) / 100)
-  }
-  return breaks
-}
-
-
-  function getColorByValue(wert, einheit, suchmodus, methode, stations) {
-    if (einheit === '°C') {
-      if (wert === -999) return 'lightgray' //keine Daten
-      if (wert < -30) return '#360259'
-      if (wert < -20) return '#00305A'
-      if (wert < -10) return '#0288D1'
-      if (wert < 0)   return '#0EEAFF'
-      if (wert < 10)  return '#45BF55'
-      if (wert < 20)  return '#FFE11A'
-      if (wert < 30)  return '#F2B705'
-      if (wert < 40)  return '#D23600'
-      return '#440505'
-    }
-    if (einheit === 'm/s') {
-      if (wert === -999) return 'lightgray' //keine Daten
-      if (wert < 0.3)  return '#FFFFFF'  // Bft 0 
-      if (wert < 1.6)  return '#B0E1F7'  // Bft 1
-      if (wert < 3.4)  return '#81D4FA'  // Bft 2
-      if (wert < 5.5)  return '#4FC3F7'  // Bft 3
-      if (wert < 8.0)  return '#4CAF50'  // Bft 4
-      if (wert < 10.8) return '#CDDC39'  // Bft 5
-      if (wert < 13.9) return '#FFEB3B'  // Bft 6
-      if (wert < 17.2) return '#FFC107'  // Bft 7
-      if (wert < 20.8) return '#FF9800'  // Bft 8
-      if (wert < 24.5) return '#F44336'  // Bft 9
-      if (wert < 28.5) return '#D32F2F'  // Bft 10
-      if (wert < 32.7) return '#7B1FA2'  // Bft 11
-      return '#4A148C'                   // Bft 12
-    }
-    if (einheit === 'mm' && suchmodus ==='fundamental' ||   (suchmodus === 'expanded' && methode === 'rsk_max') ) {
-      if (wert === -999) return 'lightgray' // keine Daten
-      if (wert < 0.1)  return '#FFFFFF'
-      if (wert < 1)    return '#E3F2FD'
-      if (wert < 5)    return '#90CAF9'
-      if (wert < 10)   return '#42A5F5'
-      if (wert < 20)   return '#1E88E5'
-      if (wert < 30)   return '#1565C0'
-      if (wert < 50)   return '#6A1B9A'
-      if (wert < 100)  return '#AD1457'
-      return '#B71C1C'
-    }                 
-    if (einheit === 'mm' && suchmodus === 'expanded' && methode === 'rsk_sum') {
-    if (wert === -999) return 'lightgray'
-    const breaks = getBreaks(stations)
-    const colors = [
-      '#B71C1C',
-      '#D32F2F',
-      '#F44336',
-      '#FB8C00',
-      '#FDD835',
-      '#90CAF9',
-      '#42A5F5',
-      '#1E88E5',
-      '#0D47A1'
-    ]
-    for (let i = 0; i < breaks.length; i++) {
-      if (wert < breaks[i]) return colors[i]
-    }
-    return colors[colors.length - 1]
-  }
-}
-
 
 
 

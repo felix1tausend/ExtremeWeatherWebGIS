@@ -1,6 +1,29 @@
 <template>
   <div class="searchinterface">
-    <h2>Statistische Analyse</h2>
+    <ul id="ul1">
+        <li><h2>Statistische Analyse </h2></li>
+        <li><button v-if = "showInfo === false" class="info-btn2" @click="showInfo = true"> ?</button>
+            <button v-else class="info-btn2" @click="showInfo = false">?</button></li>
+    </ul>
+     <div v-if="showInfo" class="modal" @click.self="showInfo = false">
+        <div class="modal-content">
+            <h3>Was macht die statistische Suche?</h3>
+            <p> Der Bereich der statistischen Analyse untersucht jährliche über Deutschland gemittelte klimatologische Kenngrößen. <br>
+                Zu den Kenngrößen gehören: <br><br>
+                <strong>1)	Die jährliche Anzahl der Hitze-, Kälte-, Sturm-, Starkregen- und Trockentage gemittelt über alle Stationen. <br><br>
+                2)	Die jährliche Minimal- und Maximaltemperatur, Maximalwindgeschwindigkeit, <br>
+                    maximale tägliche Niederschlagssumme sowie die Jahresniederschlagssumme gemittelt über alle Stationen.</strong><br><br>
+
+                Diese Kenngrößen geben Aufschluss über die Entwicklung des Extremwetters in Deutschland. <br>
+                Dabei werden die jährlichen Mittelwerte von 1950 bis 2024 in Diagrammen präsentiert. <br>
+                 Aus diesen Daten berechnet sich auch eine Trendlinie berechnet, die bis ins Jahr 2050 extrapoliert wird.
+
+
+            </p>
+            <button class="close-btn" @click="showInfo = false">Schließen</button>
+        </div>
+     </div>
+    
     <div class="bereich">
         <h3>Auswertungsmethode: </h3>
             <label class="label1">
@@ -50,6 +73,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useStore1 } from '@/stores/store1'
+const showInfo = ref(false)
 const store = useStore1()
 onMounted(() => {
     store.suchmodus = 'statistical'
@@ -93,6 +117,11 @@ h3{
 p{
     margin-top: 0;
     padding-top: 2px;
+}
+#ul1{
+    height: fit-content;
+    width: fit-content;
+    margin: 0 auto;
 }
 
 
@@ -160,6 +189,23 @@ p{
   text-align: justify;
   color: #ffffff;
   overflow: auto;
+}
+
+.info-btn2 {
+  height: 1.1rem;
+  width: 1.1rem;
+  position: flex;
+  border-radius: 100%;
+  font-weight: 600;
+  border: 1px solid #4b6380;
+  background-color: #142d4cdc;
+  font-family: 'Times New Roman', Times, serif;
+  color: #d9dbdd;
+  cursor: pointer;
+}
+
+.info-btn2:hover {
+  background-color: rgb(56, 81, 112);
 }
 
 #diagramm{

@@ -1,51 +1,48 @@
-// stores/store1.js
 import { defineStore } from 'pinia'
 import { ref, computed, watch } from 'vue'
 import { API_BASE_URL } from '@/config'
 
 export const useStore1 = defineStore('store1', function() {
-  const parameter = ref('txk')
-  const messdatum = ref('2024-12-31')
-  const von_datum = ref('2023-12-31')
-  const bis_datum = ref('2024-12-31')
-  const methode = ref('txk_max')
-  const listensortierung = ref('desc')
-  const bundesland = ref('')
-  const stationsname = ref('')         // Eingabe im Suchfeld
-  const stationsliste = ref([])        // Alle Stationen aus Datei
+  const parameter = ref('txk') //Wetterparameter
+  const methode = ref('txk_max') //Aggregationsmethode der erweiterten Suche
+  const messdatum = ref('2024-12-31') //Messdatum
+  const von_datum = ref('2023-12-31') //Messzeitraum der erweiterten Suche
+  const bis_datum = ref('2024-12-31') //Messzeitraum der erweiterten Suche
+  const listensortierung = ref('desc') //Sortierung im Extremwert-Panel
+  const bundesland = ref('') //Bundesland
+  const stationsname = ref('') // Eingabe im Suchfeld
+  const stationsliste = ref([]) // Alle Stationen aus Datei
   const ausgewählteStationen = ref([]) // Ausgewählte Stationen, für welche ein Ergebnis geliefert werden soll
-  const höheüber = ref('')
-  const höheunter = ref('')
-  const untereschwelle = ref('')
-  const obereschwelle = ref('')
+  const höheüber = ref('') //Höhenbegrenzung
+  const höheunter = ref('') //Höhenbegrenzung
+  const untereschwelle = ref('') //Messwertbegrenzung
+  const obereschwelle = ref('') //Messwertbegrenzung
   const marker = ref([]) //Stationsmarker
   const extremwerte = ref([]) //Extremwertliste
-  const suchmodus = ref('fundamental')
-  const showExtremes = ref(false)
-  const suche = ref(false)
-  const analysetyp = ref('hitze')
-  const diagramm = ref('')
+  const suchmodus = ref('fundamental') //Filterbereich
+  const showExtremes = ref(true) //Extremwertpanelsteuerung
+  const suche = ref(false) // Aktivität des Diagramm-Dialogfensters der statistischen Suche
+  const analysetyp = ref('hitze') // Analysemethode der statistischen Analayse
+  const diagramm = ref('') //Inhalt des Diagramms der statistischen Suche
 
-  watch(suchmodus, (neu) => {
-    if (neu === 'fundamental') {
+
+// Zurücksetzen der default-Werte
+  watch(suchmodus, function(neu){
+    if (neu) {
       methode.value = 'txk_max'
+      messdatum.value = '2024-12-31'
       von_datum.value = '2023-12-31'
       bis_datum.value = '2024-12-31'
       listensortierung.value = 'desc'
-    }
-    if (neu === 'expanded') {
-      messdatum.value = '2024-12-31'
+      bundesland.value = ''
+      höheüber.value = ''
+      höheunter.value = ''
+      untereschwelle.value = ''
+      obereschwelle.value = ''
     }
   })
-
-  watch([parameter, methode], () => {
-        showExtremes.value = false
-  })
-
-
-
-
-  const einheit = computed(function() {
+// Ermittlung der Einheit des Wetterparameters
+  const einheit = computed(function(){
       let param
       if (suchmodus.value === 'expanded') {
         param = methode.value.split('_')[0]
@@ -60,7 +57,7 @@ export const useStore1 = defineStore('store1', function() {
         default: return ''
       }
     })
-
+// Ermittlung der Bezeichnung des Wetterparameters
   const parameterbezeichnung = computed(function(){
       let param
       if (suchmodus.value === 'expanded') {
@@ -77,67 +74,60 @@ export const useStore1 = defineStore('store1', function() {
       }
     })
 
-
   // Stationen aus Datei laden und in Liste packen
   async function fetchStationnames() {
     const response = await fetch('/stationsliste.txt')
     const text = await response.text()
     stationsliste.value = text.split('\n')
-  }
-
+    }
   //Stationen filtern und ausgewählte Stationen anzeigen
   const filteredStations = computed(function () {
-  const q = stationsname.value.toLowerCase().trim()
-  let filtered = []
+      const q = stationsname.value.toLowerCase().trim()
+      let filtered = []
 
-  if (q.length >= 2) {
-    const words = q.split(/\s+/)
+      if (q.length >= 2) {
+        const words = q.split(/\s+/)
 
-    filtered = stationsliste.value.filter(function (s) {
-      const name = s.toLowerCase()
-      return words.every(function (word) {
-        return name.includes(word)
+        filtered = stationsliste.value.filter(function (s) {
+          const name = s.toLowerCase()
+          return words.every(function (word) {
+            return name.includes(word)
+          })
+        })
+      }
+      ausgewählteStationen.value.forEach(function (s) {
+        if (!filtered.includes(s)) filtered.push(s)
       })
-    })
-  }
-
-  ausgewählteStationen.value.forEach(function (s) {
-    if (!filtered.includes(s)) filtered.push(s)
-  })
-
-  return filtered.slice(0, 10)
-})
-
+      return filtered.slice(0, 10)
+      })
   // Station auswählen/deselektieren
   function toggleStation(station) {
-    const index = ausgewählteStationen.value.indexOf(station)
-    if (index === -1) {
-      ausgewählteStationen.value.push(station)
-    } else {
-      ausgewählteStationen.value.splice(index, 1)
+      const index = ausgewählteStationen.value.indexOf(station)
+      if (index === -1) {
+        ausgewählteStationen.value.push(station)
+      } else {
+        ausgewählteStationen.value.splice(index, 1)
+      }
     }
+
+//URL aus eingegebenen Daten zusammensetzen
+//Gemeinsame Grundwerte
+const gemeinsameParameter = function(url){
+  if (bundesland.value && bundesland.value != '-')
+    url.searchParams.set('bundesland', bundesland.value)
+  if (ausgewählteStationen.value.length > 0)
+    url.searchParams.set('stationsnamen', ausgewählteStationen.value.join(','))
+  if (höheüber.value)
+    url.searchParams.set('höheüber', höheüber.value)
+  if (höheunter.value)
+    url.searchParams.set('höheunter', höheunter.value)
+  if (untereschwelle.value != null)
+    url.searchParams.set('untereschwelle', untereschwelle.value)
+  if (obereschwelle.value != null)
+    url.searchParams.set('obereschwelle', obereschwelle.value)
   }
-
-
-  //URL aus eingegebenen Daten zusammensetzen
-  //Gemeinsame Grundwerte
-  const gemeinsameParameter = function(url){
-    if (bundesland.value && bundesland.value != '-')
-      url.searchParams.set('bundesland', bundesland.value)
-    if (ausgewählteStationen.value.length > 0)
-      url.searchParams.set('stationsnamen', ausgewählteStationen.value.join(','))
-    if (höheüber.value)
-      url.searchParams.set('höheüber', höheüber.value)
-    if (höheunter.value)
-      url.searchParams.set('höheunter', höheunter.value)
-    if (untereschwelle.value != null || untereschwelle != undefined)
-      url.searchParams.set('untereschwelle', untereschwelle.value)
-    if (obereschwelle.value != null || obereschwelle != undefined)
-      url.searchParams.set('obereschwelle', obereschwelle.value)
-  }
-
 // Einfache Suche
-const fundamentalurl = computed(() => {
+const fundamentalurl = computed( function() {
   if (suchmodus.value !== 'fundamental') return '';
   const url = new URL(`${API_BASE_URL}/api/fundamentalsearch/`)
   url.searchParams.set('parameter', parameter.value)
@@ -145,9 +135,8 @@ const fundamentalurl = computed(() => {
   gemeinsameParameter(url)
   return url.toString()
 })
-
 // Erweiterte Suche
-const expandedurl = computed(() => {
+const expandedurl = computed( function(){
   if (suchmodus.value !== 'expanded') return '';
   const url = new URL(`${API_BASE_URL}/api/expandedsearch/`)
   const [param, aggregation] = methode.value.split('_')
@@ -160,9 +149,8 @@ const expandedurl = computed(() => {
   gemeinsameParameter(url)
   return url.toString()
 })
-
 //Statistische Analyse
-const statisticalurl = computed(() => {
+const statisticalurl = computed(function() {
   if (suchmodus.value !== 'statistical') return '';
   const url = new URL(`${API_BASE_URL}/api/statisticalanalysis/`)
   url.searchParams.set('analysetyp', analysetyp.value)
@@ -188,5 +176,31 @@ async function fetchResults() {
   }}
 
 
-  return { parameter, parameterbezeichnung, einheit, messdatum, von_datum, bis_datum, methode,listensortierung, bundesland, stationsname, stationsliste, ausgewählteStationen, fetchStationnames, filteredStations, toggleStation, höheüber, höheunter, untereschwelle, obereschwelle, fundamentalurl, expandedurl, marker, extremwerte, fetchResults, suchmodus, showExtremes, suche, analysetyp, diagramm}
+  return { 
+    parameter, 
+    parameterbezeichnung, 
+    einheit, 
+    messdatum, 
+    von_datum, bis_datum, 
+    methode, 
+    listensortierung, 
+    bundesland, 
+    stationsname, 
+    stationsliste, 
+    ausgewählteStationen, 
+    fetchStationnames, 
+    filteredStations, 
+    toggleStation, 
+    höheüber, höheunter, 
+    untereschwelle, obereschwelle, 
+    fundamentalurl, 
+    expandedurl, 
+    marker, 
+    extremwerte, 
+    fetchResults,
+    suchmodus, 
+    showExtremes, 
+    suche, 
+    analysetyp, 
+    diagramm}
 })

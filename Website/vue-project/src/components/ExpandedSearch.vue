@@ -31,6 +31,7 @@
             </label>
         </div>
     </div>
+     <p v-if="zeitspanne > 10 && zeitspanne <1000"id ="warning"> Große Zeiträume bewirken lange Ladezeiten.</p>
     <div class="bereich">
         <h3>Räumliche Auswahl (optional) </h3>
         <p>Bundesland:
@@ -89,12 +90,12 @@
             <li> 
                 <button v-if = "store.showExtremes === false" class="ergebnisbutton" @click="store.showExtremes = true"> 
                     <svg viewBox="0 0 24 24" class="icon" id="icon1">
-                        <path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/>
+                        <path d="M3 3h18v18H3V3zm2 2v4h14V5H5zm0 6v4h6v-4H5zm8 0v4h6v-4h-6z"/>
                     </svg>
                 </button> 
                 <button v-else  class="ergebnisbutton" @click="store.showExtremes = false">
                     <svg viewBox="0 0 24 24" class="icon" id="icon1">
-                        <path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/>
+                        <path d="M3 3h18v18H3V3zm2 2v4h14V5H5zm0 6v4h6v-4H5zm8 0v4h6v-4h-6z"/>
                     </svg>
                 </button>
             </li>
@@ -109,6 +110,7 @@
         </ul>   
     </div>
   </div>
+  <teleport to="body">
   <div v-if="store.showExtremes" class="extrem-panel">
     <h3 id="h3-1" > Extremwerte
     </h3>
@@ -121,21 +123,28 @@
             </tr>
         </thead>
         <tr v-for="item in store.extremwerte" :key="item.id">
-           <td> {{ item.stationsname }} </td> <td>{{ item.wert }} {{ store.einheit }} &nbsp;</td><td v-if = "store.methode !== 'rsk_sum' ">{{ new Date(item.mess_datum).toLocaleDateString('de-DE') }}</td>
+           <td> {{ item.stationsname }} </td> <td>{{ item.wert }} {{ item.einheit }} &nbsp;</td><td v-if = "store.methode !== 'rsk_sum' ">{{ new Date(item.mess_datum).toLocaleDateString('de-DE') }}</td>
         </tr>
     </table>
   </div>
+</teleport>
 </template>
 
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useStore1 } from '@/stores/store1'
 const store = useStore1()
 onMounted(() => {
   store.fetchStationnames()
 })
-
+const zeitspanne = computed(function(){ //Berechnung der Differenz der Zeitspannen, um bei zu großer Differenz eine Warnung auszugenben
+  if (!store.von_datum || !store.bis_datum) return 0
+  const von = new Date(store.von_datum)
+  const bis = new Date(store.bis_datum)
+  const diffMs = bis - von
+  return Math.floor(diffMs / (1000 * 60 * 60 * 24* 365))
+})
 </script>
 
 <style scoped>
@@ -210,6 +219,12 @@ p{
     margin-top: 0;
     padding-top: 2px;
 }
+#warning{
+    margin-right: 5%;
+    text-align: right;
+    font-size: small;
+    color: red;
+}
 
 
 .ul1 {
@@ -259,8 +274,9 @@ li:nth-of-type(1n+11) {
   stroke-width: 2;
 }
 #icon1{
-    fill: rgb(255, 179, 0);
-    stroke: orange;
+    fill: rgb(54, 76, 85);
+    stroke: #142d4c;
+    stroke-width: 1;
 }
 
 

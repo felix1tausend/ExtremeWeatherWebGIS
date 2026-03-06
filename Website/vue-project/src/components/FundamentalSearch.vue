@@ -73,12 +73,12 @@
             <li> 
                 <button v-if = "store.showExtremes === false" class="ergebnisbutton" @click="store.showExtremes = true"> 
                     <svg viewBox="0 0 24 24" class="icon" id="icon1">
-                        <path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/>
+                        <path d="M3 3h18v18H3V3zm2 2v4h14V5H5zm0 6v4h6v-4H5zm8 0v4h6v-4h-6z"/>
                     </svg>
                 </button> 
                 <button v-else  class="ergebnisbutton" @click="store.showExtremes = false">
                     <svg viewBox="0 0 24 24" class="icon" id="icon1">
-                        <path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/>
+                        <path d="M3 3h18v18H3V3zm2 2v4h14V5H5zm0 6v4h6v-4H5zm8 0v4h6v-4h-6z"/>
                     </svg>
                 </button>
             </li>
@@ -93,6 +93,7 @@
         </ul>   
     </div>
   </div>
+  <teleport to="body">
   <div v-if="store.showExtremes" class="extrem-panel">
     <h3 id="h3-1" > Extremwerte
     </h3>
@@ -104,10 +105,11 @@
             </tr>
         </thead>
         <tr v-for="item in store.extremwerte" :key="item.id">
-           <td> {{ item.stationsname }} </td> <td>{{ item.wert }} {{ store.einheit }}</td>
+           <td> {{ item.stationsname }} </td> <td>{{ item.wert }} {{ item.einheit }}</td>
         </tr>
     </table>
   </div>
+  </teleport>
 </template>
 
 
@@ -230,8 +232,9 @@ li:nth-of-type(1n+11) {
   stroke-width: 2;
 }
 #icon1{
-    fill: rgb(255, 179, 0);
-    stroke: orange;
+    fill: rgb(54, 76, 85);
+    stroke: #142d4c;
+    stroke-width: 1;
 }
 
 
